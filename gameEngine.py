@@ -3,6 +3,9 @@ from pygame.locals import *
 import os
 import math
 
+from Inventory import Inventory
+
+
 # Initialize pygame
 pygame.init()
 
@@ -20,18 +23,34 @@ black = (0, 0, 0)
 
 playerKeys = [K_LEFT, K_RIGHT, K_UP, K_DOWN]
 
+class Item:
+    def __init__(self, name, x, y):
+        self.pos = (x, y)
+        self.name = name
+        self.original_sprite = pygame.image.load(os.path.join("sprites", name + ".png"))
+        self.sprite = self.original_sprite.copy()
+        self.rect = self.sprite.get_rect(center=self.pos)
 
+    def draw(self):
+        screen.blit(self.sprite, (0, 0))
 
+    def spawn(self):
+        pass
 
 class Character:
     def __init__(self, x, y, sprite):
+        self.pos = (x, y)
         self.direction = 0
         self.original_sprite = pygame.image.load(os.path.join("sprites", sprite + ".png"))
         self.sprite = self.original_sprite.copy()
-        self.rect = self.sprite.get_rect(center=(x, y))
+        self.rect = self.sprite.get_rect(center=self.pos)
+        self.inventory = Inventory()
 
     def draw(self):
         screen.blit(self.sprite, self.rect)
+
+    def spawn(self):
+        pass
 
 class Player(Character):
     def __init__(self, x, y, sprite='player'):
@@ -39,25 +58,25 @@ class Player(Character):
 
     def move(self, dx, dy):
         self.rect.move_ip(dx, dy)
-    
+
     def rotate(self, angle):
         self.sprite = pygame.transform.rotate(self.original_sprite, -angle)
         self.rect = self.sprite.get_rect(center=self.rect.center)
-        
 
     def update(self):
-        
         # Movement
         speed = 3
         keysPressed = pygame.key.get_pressed()
         dx, dy = 0, 0
 
+        # input for movement
         if keysPressed[K_w]: dy -= 1
         if keysPressed[K_s]: dy += 1
         if keysPressed[K_a]: dx -= 1
-        if keysPressed[K_d]: dx += 1    
-        
-        if (dx != 0 and dy != 0): # normalize diagonal movement
+        if keysPressed[K_d]: dx += 1
+
+        # normalize diagonal movement 
+        if dx != 0 and dy != 0: 
             magnitude = math.sqrt(dx ** 2 + dy ** 2)
             dx /= magnitude
             dy /= magnitude
@@ -76,7 +95,6 @@ class Player(Character):
             # make a line from player to mouse
             pygame.draw.line(screen, white, self.rect.center, (mouse_x, mouse_y), 2)
             pygame.display.flip()
-        
 
 class NPC(Character):
     def __init__(self, x, y, sprite='clown'):
@@ -89,9 +107,8 @@ class NPC(Character):
         self.sprite = pygame.transform.rotate(self.original_sprite, -angle)
         self.rect = self.sprite.get_rect(center=self.rect.center)
 
-
 def clear():
-    screen.fill(black)    
+    screen.fill(black)
 
 def draw():
     clock.tick(FPS)
@@ -100,7 +117,14 @@ def draw():
 def main():
     keepGoing = True
 
+    # Load the background image
+    background = pygame.image.load(os.path.join("sprites", "map.png"))
+
     player = Player(width // 2, height // 2)
+
+    # Create a camera rect centered around the player
+    camera = pygame.Rect(0, 0, width, height)
+    camera.center = player.rect.center
 
     while keepGoing:
         for event in pygame.event.get():
@@ -110,7 +134,13 @@ def main():
         # Update the player
         player.update()
 
+        # Update the camera position
+        camera.center = player.rect.center
+
         clear()
+
+        # Draw the background image onto the screen
+        screen.blit(background, (0, 0), camera)
 
         player.draw()
 
