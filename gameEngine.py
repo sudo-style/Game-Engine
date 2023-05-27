@@ -27,7 +27,6 @@ def main():
 
         mission.update()
         
-        
     pygame.quit()
 
 if __name__ == "__main__":

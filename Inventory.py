@@ -1,3 +1,8 @@
+import pygame
+from pygame.locals import *
+import os
+import math
+
 def main():
     i = Inventory()
     i.print()
@@ -66,11 +71,16 @@ def main():
 
 
 class Inventory:
-    def __init__(self):
+    def __init__(self, grandparent):
+        self.grandparent = grandparent
         self.maxInventory = {'smg': 100, 'pistol': 69, 'siniper':100}        
         self.inventory = {}
         self.updated = []
         self.addItem('camera')
+        self.addItem('tnt')
+        self.addItem('gun',30)
+        self.visible = True
+        self.interactDelay = 0
 
     def addItem(self, item, count = 1):
         print("adding item " + item)
@@ -112,7 +122,6 @@ class Inventory:
         print(f"inventory: {self.inventory}")
         print(f"updated: {self.updated}\n")
 
-
     def selectLeft(self):
         self.updated = [self.updated[-1]] + self.updated[0:-1]
         print("selected left: ")
@@ -121,6 +130,43 @@ class Inventory:
         self.updated = self.updated[1:] + self.updated[:1]
         print("selected Right: ")
     
+    def update(self):
+        self.interactDelay -= 1
+        self.draw()
+
+        # if v is pressed, toggle visibility
+        keysPressed = pygame.key.get_pressed()
+        if keysPressed[K_v] and self.interactDelay <= 0:
+            self.visible = not self.visible
+            self.interactDelay = 30
+
+    def draw(self):
+        # draw a square at the bottom of the screen
+        pygame.draw.rect(self.grandparent.screen, (255,255,255), (0, self.grandparent.height - 100, self.grandparent.width, 100))
+        
+        # draw the items
+        for i in range(len(self.updated)):
+            item = self.updated[i]
+            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 100))
+        
+        # if left arrow is pressed, select left
+        keysPressed = pygame.key.get_pressed()
+        
+        if keysPressed[K_LEFT] and self.interactDelay <= 0:
+            self.selectLeft()
+            self.interactDelay = 30
+        
+        if keysPressed[K_RIGHT] and self.interactDelay <= 0:
+            self.selectRight()
+            self.interactDelay = 30
+        
+        # if e is pressed drop item:
+        if keysPressed[K_e] and self.interactDelay <= 0 and len(self.updated) > 0:
+            self.removeItem() # make sure to spawn the item in the map
+            self.grandparent.addItem(self.updated[0], self.grandparent.player.rect.center)
+            self.interactDelay = 30
+            print(self.updated)
+
 if __name__ == "__main__":
     main()
         

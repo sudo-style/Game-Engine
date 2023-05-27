@@ -58,4 +58,6 @@ class Map:
         # Draw all NPCs
         for npc in self.npcs: npc.draw()
 
+        
+
         pygame.display.flip()

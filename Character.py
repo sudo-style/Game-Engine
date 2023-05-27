@@ -12,13 +12,10 @@ class Character:
         self.original_sprite = pygame.image.load(os.path.join("sprites", sprite + ".png"))
         self.sprite = self.original_sprite.copy()
         self.rect = self.sprite.get_rect(center=self.pos)
-        self.inventory = Inventory()
         self.parent = parent
 
     def draw(self):
-        self.parent.screen.blit(self.sprite, self.rect.topleft)
-
-        
+        pass
 
     def spawn(self):
         pass
@@ -27,6 +24,7 @@ class Player(Character):
     def __init__(self, x, y, parent):
         super().__init__(x, y, "player", parent)
         self.shootDelay = 0
+        self.inventory = Inventory(parent)
 
     def move(self, dx, dy):
         self.rect.move_ip(dx, dy)
@@ -36,6 +34,9 @@ class Player(Character):
         self.rect = self.sprite.get_rect(center=self.rect.center)
 
     def update(self):
+        # Update the inventory
+        self.inventory.update()
+
         # Movement
         speed = 3
         keysPressed = pygame.key.get_pressed()
@@ -69,6 +70,12 @@ class Player(Character):
             pygame.draw.line(self.parent.screen, white, self.rect.center, (mouse_x, mouse_y), 2)
             pygame.display.flip()
             self.shootDelay = 20
+    def draw(self):
+        self.parent.screen.blit(self.sprite, self.rect.topleft)
+        
+        if self.inventory.visible:
+            self.inventory.draw()
+
     
 
 class NPC(Character):
