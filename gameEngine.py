@@ -37,6 +37,10 @@ class Map:
 
     def update(self):
         # draw everything in the world
+        
+        # Update the player
+        self.player.update()
+        
         self.draw()
     
     def addItem(self, item, pos = (0, 0)):
@@ -45,13 +49,16 @@ class Map:
 
     def draw(self):
         # draw player
-        #self.player.draw()
+        self.player.draw()
 
         # draw all items
         for item in self.items: item.draw()
 
         # draw all npcs
         for npc in self.npcs: npc.draw()
+
+        clock.tick(FPS)
+        pygame.display.flip()
 
 
 class Item:
@@ -141,10 +148,6 @@ class NPC(Character):
 def clear():
     screen.fill(black)
 
-def draw():
-    clock.tick(FPS)
-    pygame.display.flip()
-
 def main():
     keepGoing = True
     mission = Map("Hawkes Bay")
@@ -161,8 +164,7 @@ def main():
             if event.type == QUIT:
                 keepGoing = False
 
-        # Update the player
-        mission.player.update()
+        mission.update()
 
         # Update the camera position
         camera.center = mission.player.rect.center
@@ -172,9 +174,7 @@ def main():
         # Draw the background image onto the screen
         screen.blit(background, (0, 0), camera)
 
-        mission.player.draw()
-
-        draw()
+        mission.draw()
 
     pygame.quit()
 
