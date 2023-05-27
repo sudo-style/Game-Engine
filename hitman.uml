@@ -1,0 +1,126 @@
+classDiagram
+
+ class mission{
+ -string name
+ -string description
+ -list characters
+ -list targets
+ -list rooms
+ -list items
+ }
+
+ class character{
+ -float direction
+ -sprite costume
+ }
+
+ class NPC{
+ -type goalState = normal, meeting, distracted, sus, panic
+ +path()
+ +distraction()
+ } 
+
+ class player{
+ -movement()
+ +inventory()
+ }
+
+ class inventory{
+ -int count
+ -dict maxInventory
+ +dropItem() 
+ +selectLeft()
+ +selectRight()
+ }
+
+ class grenade{
+ -int time
+ +drop()
+ }
+
+class tool{
+    use()
+}
+
+ class gun {
+    int ammo
+ }
+
+ class items {
+    -int count
+    -string name
+    +drop()
+    +equip()
+    +pickup()
+ }
+
+ 
+
+ class explosive{
+ -int damgeRadius
+ -int damage
+ }
+
+ class remoteDetinatior{
+ +onPress()
+ }
+
+ class rubberDuck{
+ +onCollsion()
+ }
+
+ class costume {
+ -list roomsBelongIn
+ -sprite costume
+ +wear()
+ +remove()
+ }
+
+
+
+ class poison {
+ -string name
+ -type = enemic, seditive, lethal
+ }
+
+
+class weapon{
+    attack()
+}
+
+class guard{
+    shoot()
+}
+
+character -- player 
+character -- NPC
+
+NPC -- civilian
+NPC -- guard
+NPC -- target
+
+items -- weapon
+items -- tool
+
+weapon -- gun
+weapon -- knife
+weapon -- explosive
+tool -- key
+tool -- poison
+tool -- coin
+
+explosive -- grenade
+explosive -- remoteDetinatior
+explosive -- rubberDuck
+
+player -- inventory
+
+mission -- character
+
+mission -- items
+
+guard -- items
+
+inventory -- items
+
+character -- costume
