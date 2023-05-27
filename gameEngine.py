@@ -23,9 +23,40 @@ black = (0, 0, 0)
 
 playerKeys = [K_LEFT, K_RIGHT, K_UP, K_DOWN]
 
+class Map:
+    def __init__(self, name):
+        self.name = name
+        self.descritpion = ""
+        self.targets = []
+        self.rooms = []
+        self.items = []
+        self.npcs = []
+        self.original_sprite = pygame.image.load(os.path.join("sprites", "map.png"))
+        self.sprite = self.original_sprite.copy()
+        self.player = Player(width/2, height/2)
+
+    def update(self):
+        # draw everything in the world
+        self.draw()
+    
+    def addItem(self, item, pos = (0, 0)):
+        self.items.append(Item(item, pos))
+        
+
+    def draw(self):
+        # draw player
+        #self.player.draw()
+
+        # draw all items
+        for item in self.items: item.draw()
+
+        # draw all npcs
+        for npc in self.npcs: npc.draw()
+
+
 class Item:
-    def __init__(self, name, x, y):
-        self.pos = (x, y)
+    def __init__(self, name, pos):
+        self.pos = pos
         self.name = name
         self.original_sprite = pygame.image.load(os.path.join("sprites", name + ".png"))
         self.sprite = self.original_sprite.copy()
@@ -116,15 +147,14 @@ def draw():
 
 def main():
     keepGoing = True
+    mission = Map("Hawkes Bay")
 
     # Load the background image
     background = pygame.image.load(os.path.join("sprites", "map.png"))
 
-    player = Player(width // 2, height // 2)
-
     # Create a camera rect centered around the player
     camera = pygame.Rect(0, 0, width, height)
-    camera.center = player.rect.center
+    camera.center = mission.player.rect.center
 
     while keepGoing:
         for event in pygame.event.get():
@@ -132,17 +162,17 @@ def main():
                 keepGoing = False
 
         # Update the player
-        player.update()
+        mission.player.update()
 
         # Update the camera position
-        camera.center = player.rect.center
+        camera.center = mission.player.rect.center
 
         clear()
 
         # Draw the background image onto the screen
         screen.blit(background, (0, 0), camera)
 
-        player.draw()
+        mission.player.draw()
 
         draw()
 
