@@ -13,3 +13,12 @@ class Item:
 
     def draw(self):
         self.parent.screen.blit(self.sprite, self.pos, self.parent.camera)
+
+    def update(self):
+        self.draw()
+
+        # if the player collides TODO somthing is wrong here 
+        if self.rect.colliderect(self.parent.player.rect):
+            self.parent.player.inventory.addItem(self.name)
+            self.parent.items.remove(self)
+            del self

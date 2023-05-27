@@ -16,7 +16,7 @@ class Character:
         self.parent = parent
 
     def draw(self):
-        self.parent.screen.blit(self.sprite, self.pos, self.parent.camera)
+        self.parent.screen.blit(self.sprite, self.rect.topleft)
 
         
 
@@ -26,6 +26,7 @@ class Character:
 class Player(Character):
     def __init__(self, x, y, parent):
         super().__init__(x, y, "player", parent)
+        self.shootDelay = 0
 
     def move(self, dx, dy):
         self.rect.move_ip(dx, dy)
@@ -39,6 +40,7 @@ class Player(Character):
         speed = 3
         keysPressed = pygame.key.get_pressed()
         dx, dy = 0, 0
+        self.shootDelay -= 1
 
         # Input for movement
         if keysPressed[K_w]: dy -= 1
@@ -62,12 +64,12 @@ class Player(Character):
 
         # Shooting
         # TODO: make this have a cooldown period instead of once per frame so you can't just hold down the mouse button
-        if pygame.mouse.get_pressed()[0]:
+        if (pygame.mouse.get_pressed()[0] and self.shootDelay <= 0):
             # Make a line from player to mouse
             pygame.draw.line(self.parent.screen, white, self.rect.center, (mouse_x, mouse_y), 2)
             pygame.display.flip()
-    def draw(self):
-        self.parent.screen.blit(self.sprite, self.rect.topleft)
+            self.shootDelay = 20
+    
 
 class NPC(Character):
     def __init__(self, x, y, sprite='clown'):

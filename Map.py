@@ -19,7 +19,7 @@ class Map:
         self.rooms = []
         self.items = []
         self.npcs = []
-        self.original_sprite = pygame.image.load(os.path.join("sprites", "map.png"))
+        self.original_sprite = pygame.image.load(os.path.join("sprites", "GroundFloor.png"))
         self.sprite = self.original_sprite.copy()
         self.player = Player(width/2, height/2, self)
         
@@ -34,7 +34,7 @@ class Map:
     def update(self):
         # Update the player
         self.player.update()
-        
+        self.clock.tick(self.fps)
         self.draw()
 
     def addItem(self, item, pos=(0, 0)):
@@ -53,11 +53,9 @@ class Map:
         self.player.draw()
 
         # Draw all items
-        for item in self.items:
-            item.draw()
+        for item in self.items: item.draw()
 
         # Draw all NPCs
-        for npc in self.npcs:
-            npc.draw()
+        for npc in self.npcs: npc.draw()
 
         pygame.display.flip()
