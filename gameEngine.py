@@ -36,30 +36,36 @@ class Map:
         self.player = Player(width/2, height/2)
 
     def update(self):
-        # draw everything in the world
-        
         # Update the player
         self.player.update()
         
         self.draw()
-    
-    def addItem(self, item, pos = (0, 0)):
+
+    def addItem(self, item, pos=(0, 0)):
         self.items.append(Item(item, pos))
         
-
+        
     def draw(self):
-        # draw player
+        screen.fill(black)
+        # Create a camera rect centered around the player
+        camera = pygame.Rect(0, 0, width, height)
+        camera.center = self.player.rect.center
+
+        # Draw the background image onto the screen relative to the camera position
+        screen.blit(self.sprite, (0, 0), camera)
+
+        # Draw player and other objects relative to the camera position
         self.player.draw()
 
-        # draw all items
-        for item in self.items: item.draw()
+        # Draw all items
+        for item in self.items:
+            item.draw()
 
-        # draw all npcs
-        for npc in self.npcs: npc.draw()
+        # Draw all NPCs
+        for npc in self.npcs:
+            npc.draw()
 
-        clock.tick(FPS)
         pygame.display.flip()
-
 
 class Item:
     def __init__(self, name, pos):
@@ -70,10 +76,7 @@ class Item:
         self.rect = self.sprite.get_rect(center=self.pos)
 
     def draw(self):
-        screen.blit(self.sprite, (0, 0))
-
-    def spawn(self):
-        pass
+        screen.blit(self.sprite, self.rect.topleft)
 
 class Character:
     def __init__(self, x, y, sprite):
@@ -85,7 +88,7 @@ class Character:
         self.inventory = Inventory()
 
     def draw(self):
-        screen.blit(self.sprite, self.rect)
+        screen.blit(self.sprite, self.rect.topleft)
 
     def spawn(self):
         pass
@@ -107,14 +110,14 @@ class Player(Character):
         keysPressed = pygame.key.get_pressed()
         dx, dy = 0, 0
 
-        # input for movement
+        # Input for movement
         if keysPressed[K_w]: dy -= 1
         if keysPressed[K_s]: dy += 1
         if keysPressed[K_a]: dx -= 1
         if keysPressed[K_d]: dx += 1
 
-        # normalize diagonal movement 
-        if dx != 0 and dy != 0: 
+        # Normalize diagonal movement
+        if dx != 0 and dy != 0:
             magnitude = math.sqrt(dx ** 2 + dy ** 2)
             dx /= magnitude
             dy /= magnitude
@@ -130,7 +133,7 @@ class Player(Character):
         # Shooting
         # TODO: make this have a cooldown period instead of once per frame so you can't just hold down the mouse button
         if pygame.mouse.get_pressed()[0]:
-            # make a line from player to mouse
+            # Make a line from player to mouse
             pygame.draw.line(screen, white, self.rect.center, (mouse_x, mouse_y), 2)
             pygame.display.flip()
 
@@ -139,25 +142,15 @@ class NPC(Character):
         super().__init__(x, y, sprite)
         self.states = ['path', 'investigate', 'sus', 'panic', 'dead']
         self.state = self.states[0]
-        self.path = [(0, 0), (100, 0), (100, 100), (0, 100)]  # keeps looping through path to test
+        self.path = [(0, 0), (100, 0), (100, 100), (0, 100)]  # Keeps looping through path to test
 
     def rotate(self, angle):
         self.sprite = pygame.transform.rotate(self.original_sprite, -angle)
         self.rect = self.sprite.get_rect(center=self.rect.center)
 
-def clear():
-    screen.fill(black)
-
 def main():
     keepGoing = True
     mission = Map("Hawkes Bay")
-
-    # Load the background image
-    background = pygame.image.load(os.path.join("sprites", "map.png"))
-
-    # Create a camera rect centered around the player
-    camera = pygame.Rect(0, 0, width, height)
-    camera.center = mission.player.rect.center
 
     while keepGoing:
         for event in pygame.event.get():
@@ -165,17 +158,7 @@ def main():
                 keepGoing = False
 
         mission.update()
-
-        # Update the camera position
-        camera.center = mission.player.rect.center
-
-        clear()
-
-        # Draw the background image onto the screen
-        screen.blit(background, (0, 0), camera)
-
-        mission.draw()
-
+        
     pygame.quit()
 
 if __name__ == "__main__":
