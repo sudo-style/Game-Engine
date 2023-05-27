@@ -43,8 +43,11 @@ class Player(Character):
     def rotate(self, angle):
         self.sprite = pygame.transform.rotate(self.original_sprite, -angle)
         self.rect = self.sprite.get_rect(center=self.rect.center)
+        
 
     def update(self):
+        
+        # Movement
         speed = 3
         keysPressed = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -62,6 +65,19 @@ class Player(Character):
         dy *= speed
         self.move(dx, dy)
 
+        # Rotation
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        angle = math.degrees(math.atan2(mouse_y - self.rect.centery, mouse_x - self.rect.centerx))
+        self.rotate(angle)
+
+        # Shooting
+        # TODO: make this have a cooldown period instead of once per frame so you can't just hold down the mouse button
+        if pygame.mouse.get_pressed()[0]:
+            # make a line from player to mouse
+            pygame.draw.line(screen, white, self.rect.center, (mouse_x, mouse_y), 2)
+            pygame.display.flip()
+        
+
 class NPC(Character):
     def __init__(self, x, y, sprite='clown'):
         super().__init__(x, y, sprite)
@@ -72,9 +88,6 @@ class NPC(Character):
     def rotate(self, angle):
         self.sprite = pygame.transform.rotate(self.original_sprite, -angle)
         self.rect = self.sprite.get_rect(center=self.rect.center)
-    
-
-
 
 
 def clear():
@@ -96,15 +109,6 @@ def main():
 
         # Update the player
         player.update()
-        
-        # Get the mouse position
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-
-        # Calculate the angle between the player's position and the mouse position
-        angle = math.degrees(math.atan2(mouse_y - player.rect.centery, mouse_x - player.rect.centerx))
-
-        # Rotate the player sprite
-        player.rotate(angle)
 
         clear()
 
