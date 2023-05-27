@@ -5,18 +5,6 @@ import math
 
 from Inventory import Inventory
 
-
-# Initialize pygame
-pygame.init()
-
-# Set up the screen
-width = 1920
-height = 1080
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Hitman")
-clock = pygame.time.Clock()
-FPS = 60
-
 # Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -24,7 +12,7 @@ black = (0, 0, 0)
 playerKeys = [K_LEFT, K_RIGHT, K_UP, K_DOWN]
 
 class Map:
-    def __init__(self, name):
+    def __init__(self, name, width, height, screen, clock, fps):
         self.name = name
         self.descritpion = ""
         self.targets = []
@@ -33,7 +21,14 @@ class Map:
         self.npcs = []
         self.original_sprite = pygame.image.load(os.path.join("sprites", "map.png"))
         self.sprite = self.original_sprite.copy()
-        self.player = Player(width/2, height/2)
+        self.player = Player(width/2, height/2, self)
+        
+        self.width = width
+        self.height = height
+        self.screen = pygame.display.set_mode((width, height))
+        self.screen = screen
+        self.clock = clock
+        self.fps = fps
 
     def update(self):
         # Update the player
@@ -46,13 +41,13 @@ class Map:
         
         
     def draw(self):
-        screen.fill(black)
+        self.screen.fill(black)
         # Create a camera rect centered around the player
-        camera = pygame.Rect(0, 0, width, height)
+        camera = pygame.Rect(0, 0, self.width, self.height)
         camera.center = self.player.rect.center
 
         # Draw the background image onto the screen relative to the camera position
-        screen.blit(self.sprite, (0, 0), camera)
+        self.screen.blit(self.sprite, (0, 0), camera)
 
         # Draw player and other objects relative to the camera position
         self.player.draw()
@@ -68,34 +63,36 @@ class Map:
         pygame.display.flip()
 
 class Item:
-    def __init__(self, name, pos):
+    def __init__(self, name, pos, parent):
         self.pos = pos
         self.name = name
         self.original_sprite = pygame.image.load(os.path.join("sprites", name + ".png"))
         self.sprite = self.original_sprite.copy()
         self.rect = self.sprite.get_rect(center=self.pos)
+        self.parent = parent
 
     def draw(self):
-        screen.blit(self.sprite, self.rect.topleft)
+        self.parent.screen.blit(self.sprite, self.rect.topleft)
 
 class Character:
-    def __init__(self, x, y, sprite):
+    def __init__(self, x, y, sprite, parent):
         self.pos = (x, y)
         self.direction = 0
         self.original_sprite = pygame.image.load(os.path.join("sprites", sprite + ".png"))
         self.sprite = self.original_sprite.copy()
         self.rect = self.sprite.get_rect(center=self.pos)
         self.inventory = Inventory()
+        self.parent = parent
 
     def draw(self):
-        screen.blit(self.sprite, self.rect.topleft)
+        self.parent.screen.blit(self.sprite, self.rect.topleft)
 
     def spawn(self):
         pass
 
 class Player(Character):
-    def __init__(self, x, y, sprite='player'):
-        super().__init__(x, y, sprite)
+    def __init__(self, x, y, parent):
+        super().__init__(x, y, "player", parent)
 
     def move(self, dx, dy):
         self.rect.move_ip(dx, dy)
@@ -134,7 +131,7 @@ class Player(Character):
         # TODO: make this have a cooldown period instead of once per frame so you can't just hold down the mouse button
         if pygame.mouse.get_pressed()[0]:
             # Make a line from player to mouse
-            pygame.draw.line(screen, white, self.rect.center, (mouse_x, mouse_y), 2)
+            pygame.draw.line(self.parent.screen, white, self.rect.center, (mouse_x, mouse_y), 2)
             pygame.display.flip()
 
 class NPC(Character):
@@ -150,7 +147,14 @@ class NPC(Character):
 
 def main():
     keepGoing = True
-    mission = Map("Hawkes Bay")
+    pygame.init()
+    width = 1920
+    height = 1080
+    screen = pygame.display.set_mode((width, height))
+    pygame.display.set_caption("Hitman")
+    clock = pygame.time.Clock()
+    fps = 60
+    mission = Map("Hawkes Bay", width, height, screen, clock, fps)
 
     while keepGoing:
         for event in pygame.event.get():
