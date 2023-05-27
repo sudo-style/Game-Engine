@@ -132,13 +132,16 @@ class Inventory:
     
     def update(self):
         self.interactDelay -= 1
-        self.draw()
+        
+        if self.visible: 
+            self.draw()
 
         # if v is pressed, toggle visibility
         keysPressed = pygame.key.get_pressed()
         if keysPressed[K_v] and self.interactDelay <= 0:
             self.visible = not self.visible
             self.interactDelay = 30
+            
 
     def draw(self):
         # draw a square at the bottom of the screen
@@ -147,24 +150,24 @@ class Inventory:
         # draw the items
         for i in range(len(self.updated)):
             item = self.updated[i]
-            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 100))
+            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 75))
         
         # if left arrow is pressed, select left
         keysPressed = pygame.key.get_pressed()
         
         if keysPressed[K_LEFT] and self.interactDelay <= 0:
             self.selectLeft()
-            self.interactDelay = 30
+            self.interactDelay = 20
         
         if keysPressed[K_RIGHT] and self.interactDelay <= 0:
             self.selectRight()
-            self.interactDelay = 30
+            self.interactDelay = 20
         
         # if e is pressed drop item:
         if keysPressed[K_e] and self.interactDelay <= 0 and len(self.updated) > 0:
             self.removeItem() # make sure to spawn the item in the map
             self.grandparent.addItem(self.updated[0], self.grandparent.player.rect.center)
-            self.interactDelay = 30
+            self.interactDelay = 20
             print(self.updated)
 
 if __name__ == "__main__":
