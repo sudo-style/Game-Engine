@@ -20,11 +20,19 @@ black = (0, 0, 0)
 
 playerKeys = [K_LEFT, K_RIGHT, K_UP, K_DOWN]
 
-class Player:
-    def __init__(self, x, y):
+
+
+
+class Character:
+    def __init__(self, sprite):
+        self.direction = 0
+        self.original_sprite = pygame.image.load(os.path.join("sprites", sprite + ".png"))
+
+class Player(Character):
+    def __init__(self, x, y, sprite='player'):
+        super().__init__(sprite) 
         self.x = x
         self.y = y
-        self.original_sprite = pygame.image.load(os.path.join("sprites", "player.png"))
         self.sprite = self.original_sprite.copy()
         self.rect = self.sprite.get_rect(center=(x, y))
 
