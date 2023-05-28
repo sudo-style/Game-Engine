@@ -12,13 +12,13 @@ class Item:
         self.parent = parent
 
     def draw(self):
-        self.parent.screen.blit(self.sprite, self.pos, self.parent.camera)
+        self.parent.screen.blit(self.sprite, self.rect.topleft)
 
     def update(self):
         self.draw()
-
         # if the player collides TODO somthing is wrong here 
-        if self.rect.colliderect(self.parent.player.rect):
+        keysPressed = pygame.key.get_pressed()
+        if self.rect.colliderect(self.parent.player.rect) and keysPressed[K_e]:
             self.parent.player.inventory.addItem(self.name)
             self.parent.items.remove(self)
             del self

@@ -21,7 +21,7 @@ class Map:
         self.npcs = []
         self.original_sprite = pygame.image.load(os.path.join("sprites", "GroundFloor.png"))
         self.sprite = self.original_sprite.copy()
-        self.player = Player(width/2, height/2, self)
+        self.player = Player((width/2, height/2), self)
         
         self.width = width
         self.height = height
@@ -34,6 +34,9 @@ class Map:
     def update(self):
         # Update the player
         self.player.update()
+        for npc in self.npcs: npc.update()
+        for item in self.items: item.update()
+
         self.clock.tick(self.fps)
         self.draw()
 
