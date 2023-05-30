@@ -27,9 +27,7 @@ def main():
                     pygame.quit()
                     sys.exit()
         camera_group.update()
-        camera_group.custom_draw(mission.player)
-        pygame.display.update()
-        clock.tick(fps)
+        camera_group.custom_draw(mission.player) # this will focus on the player
 
 if __name__ == "__main__":
     main()

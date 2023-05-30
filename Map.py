@@ -5,7 +5,7 @@ import math
 from random import randint
 
 from Item import Item
-from Character import Player
+from Character import Character, Player
 
 # Colors
 white = (255, 255, 255)
@@ -23,7 +23,6 @@ class Map:
         self.original_sprite = pygame.image.load(os.path.join("sprites", "GroundFloor.png"))
         self.sprite = self.original_sprite.copy()
         
-        
         self.width = width
         self.height = height
         self.screen = screen
@@ -31,37 +30,25 @@ class Map:
         self.fps = fps
         self.camera_group = camera_group
 
-        self.player = Player((width/2, height/2), self.camera_group)
-        #Player((width/2, height/2), self.camera_group)
-        # make a bunch of items
+        self.player = Player((width/2, height/2), self.camera_group, self, 'player')
         
+        # adding an npc to the map
+        self.npcs.append(Character((0,0), self.camera_group, self, 'clown'))
+        self.npcs.append(Character((width,0), self.camera_group, self, 'clown'))
+        self.npcs.append(Character((width/2,height/2), self.camera_group, self, 'clown'))
+
         for i in range(20):
             random_x = randint(0,2000)
             random_y = randint(0,2000)
-            Item((random_x, random_y), self.camera_group)
+            Item((random_x, random_y), self.camera_group, self)
 
-        # make a player
-        
-        
-    def update(self):
-        # Update the player
-        self.player.update()
-        for npc in self.npcs: npc.update()
-        for item in self.items: item.update()
-
-        self.clock.tick(self.fps)
-        self.draw()
         
     def addItem(self, item, pos=(0, 0)):
         self.items.append(Item(item, pos, self))
         
     def draw(self):
         self.screen.fill(black)
-
         self.camera_group.update()
         self.camera_group.draw(self.screen)
         pygame.display.update()
        
-
-
-        

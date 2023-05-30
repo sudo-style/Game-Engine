@@ -170,6 +170,9 @@ class Inventory:
             self.interactDelay = 20
             print(self.updated)
 
+        pygame.display.update()
+        
+
 if __name__ == "__main__":
     main()
         
