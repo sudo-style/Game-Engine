@@ -25,11 +25,11 @@ class Map:
         
         self.width = width
         self.height = height
-        self.screen = pygame.display.set_mode((width, height))
         self.screen = screen
         self.clock = clock
         self.fps = fps
         self.camera = pygame.Rect(0, 0, self.width, self.height)
+        self.cameraGroup = pygame.sprite.Group()
         
     def update(self):
         # Update the player
@@ -60,7 +60,5 @@ class Map:
 
         # Draw all NPCs
         for npc in self.npcs: npc.draw()
-
-        
 
         pygame.display.flip()
