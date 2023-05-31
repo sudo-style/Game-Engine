@@ -131,17 +131,36 @@ class Inventory:
         print("selected Right: ")
     
     def update(self):
+        # a short delay between interactions
         self.interactDelay -= 1
         
-        if self.visible: 
-            self.draw()
+
 
         # if v is pressed, toggle visibility
         keysPressed = pygame.key.get_pressed()
         if keysPressed[K_v] and self.interactDelay <= 0:
             self.visible = not self.visible
             self.interactDelay = 30
-            
+
+        if not self.visible: return
+        
+        # rotate the carousel for directional keys
+        if keysPressed[K_LEFT] and self.interactDelay <= 0:
+            self.selectLeft()
+            self.interactDelay = 20
+
+        if keysPressed[K_RIGHT] and self.interactDelay <= 0:
+            self.selectRight()
+            self.interactDelay = 20            
+
+        # if e is pressed drop item:
+        if keysPressed[K_e] and self.interactDelay <= 0 and len(self.updated) > 0:
+            self.grandparent.addItem((self.grandparent.player.rect.center), self.updated[0])
+            self.removeItem() # make sure to spawn the item in the map
+            self.interactDelay = 20
+            print(self.updated)
+
+        self.draw()
 
     def draw(self):
         # draw a square at the bottom of the screen
@@ -152,24 +171,6 @@ class Inventory:
             item = self.updated[i]
             self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 75))
         
-        # if left arrow is pressed, select left
-        keysPressed = pygame.key.get_pressed()
-        
-        if keysPressed[K_LEFT] and self.interactDelay <= 0:
-            self.selectLeft()
-            self.interactDelay = 20
-        
-        if keysPressed[K_RIGHT] and self.interactDelay <= 0:
-            self.selectRight()
-            self.interactDelay = 20
-        
-        # if e is pressed drop item:
-        if keysPressed[K_e] and self.interactDelay <= 0 and len(self.updated) > 0:
-            self.removeItem() # make sure to spawn the item in the map
-            self.grandparent.addItem(self.updated[0], self.grandparent.player.rect.center)
-            self.interactDelay = 20
-            print(self.updated)
-
         pygame.display.update()
         
 

@@ -4,7 +4,7 @@ import os
 import math
 from random import randint
 
-from Item import Item
+from Item import Item, Explosive
 from Character import Character, Player
 
 # Colors
@@ -30,25 +30,23 @@ class Map:
         self.fps = fps
         self.camera_group = camera_group
 
+        # add player to the map
         self.player = Player((width/2, height/2), self.camera_group, self, 'player')
         
         # adding an npc to the map
-        self.npcs.append(Character((0,0), self.camera_group, self, 'clown'))
-        self.npcs.append(Character((width,0), self.camera_group, self, 'clown'))
-        self.npcs.append(Character((width/2,height/2), self.camera_group, self, 'clown'))
+        self.addNPC((width, height/2), 'clown')
 
-        for i in range(20):
-            random_x = randint(0,2000)
-            random_y = randint(0,2000)
-            Item((random_x, random_y), self.camera_group, self)
+        # adding an item to the map
+        #self.addItem((width/2, height/2), 'camera')
 
-        
-    def addItem(self, item, pos=(0, 0)):
-        self.items.append(Item(item, pos, self))
-        
-    def draw(self):
-        self.screen.fill(black)
-        self.camera_group.update()
-        self.camera_group.draw(self.screen)
-        pygame.display.update()
-       
+        self.addExplosive((width/2, height/2))
+
+
+    def addExplosive(self, pos, name = 'bomb'):
+        self.items.append(Explosive(pos, self.camera_group, self, name))
+
+    def addItem(self, pos, name):
+        self.items.append(Item(pos, self.camera_group, self, name))
+
+    def addNPC(self, pos, name):
+        self.npcs.append(Character(pos, self.camera_group, self, name))
