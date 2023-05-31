@@ -8,7 +8,9 @@ white = (255, 255, 255)
 class Character(pygame.sprite.Sprite):
     def __init__(self, pos, group, parent, name = "clown"):
         super().__init__(group)
+        self.name = name
         self.image = pygame.image.load(os.path.join('sprites',name + '.png')).convert_alpha()
+        self.ko_image = pygame.image.load(os.path.join('sprites','ko.png')).convert_alpha()
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
         self.direction = pygame.math.Vector2()
@@ -19,19 +21,31 @@ class Character(pygame.sprite.Sprite):
         self.group = group
         self.parent = parent
         self.health = 100
-        self.name = name
+        self.oxygen = 100
         self.KO = False
-        
+
     def update(self):
         # if an NPC and a player collide then print "hello"
         if self.parent.player.rect.colliderect(self.rect):
             # if player clicks on the NPC then print "hello"
             if pygame.mouse.get_pressed()[0]:
                 print("hello")
-        
-        if self.health <= 0:
-            self.kill()
 
+        # lets the NPC breathe oxygen if not getting strangled and not KO yet
+        self.oxygen += 1
+        if self.oxygen > 100: self.oxygen = 100
+            
+        if self.health <= 0: self.kill()
+
+    def ko(self):
+        self.image = self.ko_image
+        self.KO = True
+
+    def gettingStrangled(self):
+        # oxygen decreases when getting strangled
+        self.oxygen -= 2
+        if self.oxygen <= 0: 
+            self.ko()
 
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
@@ -47,7 +61,6 @@ class Player(Character):
         self.draw()
         self.rect.center += self.direction * self.speed
         self.inventory.update()
-    
 
     def input(self):
         self.movement()
@@ -58,6 +71,21 @@ class Player(Character):
         if keysPressed[K_m]:
             self.weapon()
             print("pressed m")
+
+        if keysPressed[K_t]:
+            self.takeDisguise()
+            
+
+    def takeDisguise(self):
+        # check if player is close to the suit
+        for npc in self.parent.npcs:
+            if self.rect.colliderect(npc.rect):
+                # if player clicks on suit then print "suit up"
+                if npc.KO:
+                    # take the disguise
+                    self.image = pygame.image.load(os.path.join('sprites',npc.name + '.png')).convert_alpha()
+                    self.original_image = self.image.copy()
+                    npc.image = pygame.image.load(os.path.join('sprites','naked.png')).convert_alpha()
     
     def weapon(self):
         # strangle if NPC is close enough
@@ -67,11 +95,21 @@ class Player(Character):
                 if self.rect.colliderect(npc.rect):
                     # if player clicks on npc then print "strangle"
                     self.strangle(npc)
-                    npc.KO = True
+                    print(npc.oxygen)
+    
+    def suitUp(self):
+        # check if player is close to the suit
+        for item in self.parent.items:
+            if self.rect.colliderect(item.rect):
+                # if player clicks on suit then print "suit up"
+                self.inventory.addItem(item.name)
+                item.kill()
+                print("suit up")
 
 
     def strangle(self, npc):
         # drag the npc to the player
+        npc.gettingStrangled()
         npc.rect.center = self.rect.center
         
     def movement(self):
