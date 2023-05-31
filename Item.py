@@ -12,6 +12,9 @@ class Item(pygame.sprite.Sprite):
     
     def drop(self):
         print(f"dropped {self.name}")
+    
+    def pickUp(self):
+        print(f"picked up {self.name}")
 
 class Explosive(Item):
     def __init__(self, pos, group, parent, name = "bomb"):

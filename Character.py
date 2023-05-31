@@ -25,6 +25,7 @@ class Character(pygame.sprite.Sprite):
         self.health = 100
         self.oxygen = 100
         self.KO = False
+        self.suitName = name
 
     def update(self):
         # if an NPC and a player collide then print "hello"
@@ -85,11 +86,13 @@ class Player(Character):
                 # if player clicks on suit then print "suit up"
                 if npc.KO:
                     # take the disguise
-                    self.image = pygame.image.load(os.path.join('sprites', 'character', npc.name, npc.name + '.png')).convert_alpha()
-
-                    self.original_image = self.image.copy()
+                    newSuit = npc.suitName
+                    self.original_image = pygame.image.load(os.path.join('sprites', 'character', newSuit, newSuit + '.png')).convert_alpha()
+                    npc.suitName = self.suitName
+                    self.suitName = newSuit
                     npc.image = npc.naked_image
-    
+                    self.rect = self.image.get_rect(center = self.rect.center)
+                    
     def weapon(self):
         # strangle if NPC is close enough
         if self.inventory.currentWeapon() == 'fiberWire':

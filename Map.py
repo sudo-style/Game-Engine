@@ -41,13 +41,15 @@ class Map:
 
         self.addExplosive((width/2, height/2))
         self.addNPC((width/2, height/2), 'clown')
-
-
+    
     def addExplosive(self, pos, name = 'bomb'):
-        self.items.append(Explosive(pos, self.camera_group, self, name))
+        explosive = Explosive(pos, self.camera_group, self, name)
+        self.items.append(explosive)
 
     def addItem(self, pos, name):
-        self.items.append(Item(pos, self.camera_group, self, name))
+        item = Item(pos, self.camera_group, self, name)
+        self.items.append(item)
 
     def addNPC(self, pos, name):
-        self.npcs.append(Character(pos, self.camera_group, self, name))
+        character = Character(pos, self.camera_group, self, name)
+        self.npcs.append(character)
