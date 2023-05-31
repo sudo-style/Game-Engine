@@ -48,14 +48,19 @@ class Explosive(Item):
                 self.sound.play()
     
     def explode(self):
-        # TODO: add explosion animation
-        # TODO: add explosion sound
-        
+        # TODO: add explosion animation        
         # check any characters in the radius
         for character in self.parent.npcs:
             if (self.rect.colliderect(character.rect)):
                 character.health -= self.damage
         
+        # explode explosives in the radius
+        for explosive in self.parent.items:
+            if explosive == self: break
+            if (self.rect.colliderect(explosive.rect)):
+                self.sound.play()
+                explosive.explode()
+
         # remove the explosive from the map
         self.kill()
         
