@@ -3,6 +3,7 @@ from pygame.locals import *
 import os
 from Inventory import Inventory
 import math
+import copy
 
 white = (255, 255, 255)
 class Character(pygame.sprite.Sprite):
@@ -16,7 +17,7 @@ class Character(pygame.sprite.Sprite):
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
         self.direction = pygame.math.Vector2()
-        self.speed = 5
+        self.speed = 3
         self.angle = 0
         oldCenter = self.rect.center
         self.oldCenter = oldCenter
@@ -35,26 +36,30 @@ class Character(pygame.sprite.Sprite):
                 print("hello")
 
         # lets the NPC breathe oxygen if not getting strangled and not KO yet
-        self.oxygen += 1
-        if self.oxygen > 100: self.oxygen = 100
-            
+        self.breathing()
         if self.health <= 0: self.kill()
 
     def ko(self):
         self.image = self.ko_image
         self.KO = True
 
+
     def gettingSubdued(self):
         # oxygen decreases when getting strangled
         self.oxygen -= 2
         if self.oxygen <= 0: 
             self.ko()
+    
+    def breathing(self):
+        self.oxygen += 1
+        if self.oxygen > 100: self.oxygen = 100
 
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
         self.inventory = Inventory(self.parent)
         self.inputDelay = 0
+        self.speed = 5
 
     def update(self):
         self.input()
@@ -137,31 +142,53 @@ class Player(Character):
         if self.inventory.visible: self.inventory.drawCarousel()
         pygame.display.update()
 
+
+
 class NPC(Character):
-    def __init__(self, pos, group, parent, name = "guard"):
+    def __init__(self, pos, group, parent, name="guard"):
         super().__init__(pos, group, parent, name)
         self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
         self.statesIndex = 1
-        self.waypoints = [(0,0), (100, 100), (200, 200)]
+        self.waypoints = [['patrol', (0, 0)], ['idle', 200], ['patrol', (100, 100)], ['patrol', (200, 200)], ['patrol', (self.parent.width, self.parent.height)], ['idle', 100]]
+        self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.waypointIndex = 0
 
     def update(self):
-        if self.states[self.statesIndex] == 'patrol':    
-            self.patrol()
-    
+        self.waypointsControler()
+
+        self.breathing()
+        if self.health <= 0: self.kill()
+
+    def waypointsControler(self):
+        if self.KO:
+            return
+        if self.states[self.statesIndex] == 'search':
+            self.search()  # move towards the position of the sound
+            return
+
+        state = self.waypoints[self.waypointIndex][0]
+        if state == 'patrol':
+            self.patrol()  # move towards the next waypoint
+        if state == 'idle':
+            self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
+
+        if self.waypointIndex >= len(self.waypoints):
+            self.waypointIndex = 0
+            self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
+
+    def idle(self):
+        self.waypoints[self.waypointIndex][1] -= 1
+        if self.waypoints[self.waypointIndex][1] <= 0:
+            self.waypointIndex += 1
+
     def patrol(self):
-        # move towards the next waypoint
-        self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1] - self.rect.centery)
+        self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][1][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1][1] - self.rect.centery)
         if self.direction.length() > 0:
             self.direction.normalize_ip()
         self.rect.center += self.direction * self.speed
 
-        # if the npc reaches the waypoint, move to the next waypoint
-        # check if the npc's collider is touching an x,y coordinate   
-        # 
-        if self.rect.collidepoint(self.waypoints[self.waypointIndex]):
+        if self.rect.collidepoint(self.waypoints[self.waypointIndex][1]):
             self.waypointIndex += 1
-            if self.waypointIndex >= len(self.waypoints): self.waypointIndex = 0
 
     def ko(self):
         self.image = self.ko_image
