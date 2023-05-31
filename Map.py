@@ -29,22 +29,24 @@ class Map:
         self.player = Player((width/2, height/2), self.camera_group, self, 'player')
         
         # adding an npc to the map
-        self.addNPC((width, height/2), 'clown')
-
-        # adding an item to the map
-        #self.addItem((width/2, height/2), 'camera')
-
+        
         self.addExplosive((width/2, height/2))
-        self.addNPC((width/2, height/2), 'clown')
+        self.addCharacter((width/2, height/2), 'clown')
+        self.addItem((width/2-200, height/2+ 100), 'gun', 5)
+        self.addEnemy((width, height/2), 'guard')
     
     def addExplosive(self, pos, name = 'bomb'):
         explosive = Explosive(pos, self.camera_group, self, name)
         self.items.append(explosive)
 
-    def addItem(self, pos, name):
-        item = Item(pos, self.camera_group, self, name)
+    def addItem(self, pos, name, n = 1):
+        item = Item(pos, self.camera_group, self, name, n)
         self.items.append(item)
 
-    def addNPC(self, pos, name):
+    def addCharacter(self, pos, name):
+        character = Character(pos, self.camera_group, self, name)
+        self.npcs.append(character)
+
+    def addEnemy(self, pos, name):
         character = NPC(pos, self.camera_group, self, name)
         self.npcs.append(character)

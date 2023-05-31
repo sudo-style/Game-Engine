@@ -4,18 +4,18 @@ import os
 import math
 
 explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
-guns = ['smg', 'pistol', 'siniper', 'gun']
+guns = ['smg', 'pistol', 'sniper', 'gun']
 keep = ['fiberWire']
 
 class Inventory:
     def __init__(self, grandparent):
         self.grandparent = grandparent
-        self.maxInventory = {'smg': 100, 'pistol': 69, 'siniper':100}        
+        self.maxInventory = {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':20}  
         self.inventory = {}
         self.updated = []
         self.addItem('fiberWire')
         self.addItem('tnt')
-        #self.addItem('gun',30)
+        self.addItem('gun',5)
         self.visible = True
         self.interactDelay = 0
 
@@ -67,7 +67,14 @@ class Inventory:
         
     def selectRight(self):
         self.updated = self.updated[1:] + self.updated[:1]
-    
+
+    def drawAmmo(self):
+        if self.currentWeapon() in guns:
+            ammo = self.inventory[self.currentWeapon()]                                                 # gets the amount of ammo
+            font = pygame.font.SysFont('arial', 30)                                                     # creates a font
+            text = font.render(f"Ammo: {ammo}", True, (255, 255, 255))                                  # creates the text
+            self.grandparent.screen.blit(text, (self.grandparent.width - text.get_width() - 10, 10))    # Blit the text onto the main screen
+
     def update(self):
         # a short delay between interactions
         self.interactDelay -= 1
@@ -78,9 +85,12 @@ class Inventory:
             self.visible = not self.visible
             self.interactDelay = 30
 
+        self.drawAmmo()
+        pygame.display.update()
+
         # everything below needs the inventory to be visible
         if not self.visible: return
-        
+
         # rotate the carousel for directional keys
         if keysPressed[K_LEFT] and self.interactDelay <= 0:
             self.selectLeft()
@@ -106,8 +116,9 @@ class Inventory:
             self.removeItem() # make sure to spawn the item in the map
             self.interactDelay = 20
             print(self.updated)
-
+        
         self.drawCarousel()
+        
 
     def drawCarousel(self):
         # draw a square at the bottom of the screen
@@ -117,5 +128,4 @@ class Inventory:
         for i in range(len(self.updated)):
             item = self.updated[i]
             self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", 'items', item + ".png")), (i*100, self.grandparent.height - 75))
-        
-        pygame.display.update()
+

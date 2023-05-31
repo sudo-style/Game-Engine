@@ -3,19 +3,38 @@ from pygame.locals import *
 import os
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, pos, group, parent, name= "fiberWire"):
+    def __init__(self, pos, group, parent, name, count= 1):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         self.name = name
+        self.pickUpTime = 0
+        self.count = count
     
     def drop(self):
         print(f"dropped {self.name}")
+
     
     def pickUp(self):
         print(f"picked up {self.name}")
+        # add to inventory of the player
+        self.parent.player.inventory.addItem(self.name, self.count)
+        self.kill()
 
+    def update(self):
+        self.pickUpTime -= 1
+        if self.parent.player.rect.colliderect(self.rect):       
+            # if e is pressed then pick up
+            if pygame.key.get_pressed()[K_p] and self.pickUpTime <= 0:
+                self.pickUpTime = 20
+                self.pickUp()
+
+    def tryPickUp(self):
+        if pygame.key.get_pressed()[K_p] and self.pickUpTime <= 0:
+                self.pickUpTime = 20
+                self.pickUp()
+                
 class Explosive(Item):
     def __init__(self, pos, group, parent, name = "bomb"):
         super().__init__(pos, group, parent, name)
@@ -27,7 +46,7 @@ class Explosive(Item):
         self.radius = 100
         self.fuseTime = 200
         self.boolTriggered = False
-
+        
         # sound
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
         self.fuse = pygame.mixer.Sound(os.path.join("sounds", "fuse.mp3"))
@@ -37,13 +56,17 @@ class Explosive(Item):
         self.boolTriggered = True
         self.fuse.play()
 
-
     def update(self):
         # trigger the explosive if the player is close enough
+        self.pickUpTime -= 1
         if self.parent.player.rect.colliderect(self.rect):
             if pygame.mouse.get_pressed()[0]:
                 self.boolTriggered = True
-
+                self.fuse.play()
+            
+            # if p is pressed then pick up
+            self.tryPickUp()
+                
         if (self.boolTriggered):
             self.fuseTime -= 1
             if (self.fuseTime <= 0):
@@ -59,6 +82,8 @@ class Explosive(Item):
         
         # explode explosives in the radius
         for explosive in self.parent.items:
+            # check if the class is an explosive
+            if not isinstance(explosive, Explosive): continue
             if explosive == self: break
             if (self.rect.colliderect(explosive.rect)):
                 self.sound.play()

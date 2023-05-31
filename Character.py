@@ -7,7 +7,7 @@ import copy
 
 white = (255, 255, 255)
 class Character(pygame.sprite.Sprite):
-    def __init__(self, pos, group, parent, name = "clown"):
+    def __init__(self, pos, group, parent, name):
         super().__init__(group)
         self.name = name
         self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
@@ -66,7 +66,11 @@ class Player(Character):
         self.draw()
         self.rect.center += self.direction * self.speed
         self.inventory.update()
+        pygame.display.update()
         self.inputDelay -= 1
+    
+    def shoot():
+        print('shoot')
 
     def input(self):
         self.movement()
@@ -76,7 +80,7 @@ class Player(Character):
         keysPressed = pygame.key.get_pressed()
  
         if keysPressed[K_b]:
-            self.weapon()
+            self.weaponAttack()
  
         if keysPressed[K_t] and self.inputDelay < 0:
             self.inputDelay = 30
@@ -96,7 +100,7 @@ class Player(Character):
                     npc.image = npc.naked_image
                     self.rect = self.image.get_rect(center = self.rect.center)
                     
-    def weapon(self):
+    def weaponAttack(self):
         # subdue if NPC is close enough
         if self.inventory.currentWeapon() == 'fiberWire':
             # check if npc is close to players
@@ -104,6 +108,10 @@ class Player(Character):
                 if self.rect.colliderect(npc.rect):
                     # subdue the npc
                     self.subdue(npc)
+        
+        if self.inventory.currentWeapon() == 'gun':
+            self.shoot()
+            pass
 
     def subdue(self, npc):
         # drag the npc to the player
@@ -142,8 +150,6 @@ class Player(Character):
         if self.inventory.visible: self.inventory.drawCarousel()
         pygame.display.update()
 
-
-
 class NPC(Character):
     def __init__(self, pos, group, parent, name="guard"):
         super().__init__(pos, group, parent, name)
@@ -152,29 +158,48 @@ class NPC(Character):
         self.waypoints = [['patrol', (0, 0)], ['idle', 200], ['patrol', (100, 100)], ['patrol', (200, 200)], ['patrol', (self.parent.width, self.parent.height)], ['idle', 100]]
         self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.waypointIndex = 0
+        self.searchPos = pygame.Vector2()
 
     def update(self):
-        self.waypointsControler()
-
+        self.waypointsControler() # controls movements of the NPC
         self.breathing()
         if self.health <= 0: self.kill()
 
     def waypointsControler(self):
-        if self.KO:
-            return
-        if self.states[self.statesIndex] == 'search':
+        state = self.getState()
+        
+        if state == 'ko': 
+            return 
+        if state == 'search':
             self.search()  # move towards the position of the sound
             return
-
+        if state == 'combat':
+            self.combat()
         state = self.waypoints[self.waypointIndex][0]
-        if state == 'patrol':
-            self.patrol()  # move towards the next waypoint
-        if state == 'idle':
-            self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
+        if state == 'patrol': self.patrol()  # move towards the next waypoint
+        if state == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
 
         if self.waypointIndex >= len(self.waypoints):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
+
+    def combat(self):
+        # shoot at the player
+        pass
+
+    def getState(self):
+        return self.states[self.statesIndex]
+
+    def search(self):
+        self.direction = pygame.math.Vector2(self.searchPos[0] - self.rect.centerx, self.searchPos[1] - self.rect.centery)
+        if self.direction.length() > 0:
+            self.direction.normalize_ip()
+        self.rect.center += self.direction * self.speed
+
+        # if the NPC is close to the player then go into combat mode
+        if self.rect.colliderect(self.parent.player.rect):
+            self.statesIndex = 4
+
 
     def idle(self):
         self.waypoints[self.waypointIndex][1] -= 1
