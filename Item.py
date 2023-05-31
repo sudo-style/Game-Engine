@@ -3,11 +3,15 @@ from pygame.locals import *
 import os
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, pos, group, parent, name= "camera"):
+    def __init__(self, pos, group, parent, name= "fiberWire"):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", name +".png")).convert_alpha()
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
+        self.name = name
+    
+    def drop(self):
+        print(f"dropped {self.name}")
 
 class Explosive(Item):
     def __init__(self, pos, group, parent, name = "bomb"):
@@ -18,11 +22,20 @@ class Explosive(Item):
         
         self.damage = 100
         self.radius = 100
-        self.fuseTime = 40
+        self.fuseTime = 200
         self.boolTriggered = False
+    
+    def drop(self):
+        print(f"dropped Explosive {self.name}")
+        self.boolTriggered = True
 
 
     def update(self):
+        # trigger the explosive if the player is close enough
+        if self.parent.player.rect.colliderect(self.rect):
+            if pygame.mouse.get_pressed()[0]:
+                self.boolTriggered = True
+
         if (self.boolTriggered):
             self.fuseTime -= 1
             if (self.fuseTime <= 0):

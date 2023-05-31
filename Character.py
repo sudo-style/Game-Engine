@@ -27,6 +27,9 @@ class Character(pygame.sprite.Sprite):
             # if player clicks on the NPC then print "hello"
             if pygame.mouse.get_pressed()[0]:
                 print("hello")
+        
+        if self.health <= 0:
+            self.kill()
 
 
 class Player(Character):
@@ -52,9 +55,7 @@ class Player(Character):
         self.rect = self.image.get_rect()
         self.rect.center = oldCenter
 
-        if self.inventory.visible:
-            self.inventory.draw()
-        
+        if self.inventory.visible: self.inventory.drawCarousel()
         pygame.display.update()
 
     def input(self):

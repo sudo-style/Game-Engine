@@ -3,72 +3,9 @@ from pygame.locals import *
 import os
 import math
 
-def main():
-    i = Inventory()
-    i.print()
-    i.addItem('smg',30)
-    i.print()
-    i.addItem('pistol',30)
-    i.print()
-    i.addItem('crowbar')
-    i.print()
-    i.addItem('camera')
-
-    i.addItem('smg',30)
-    i.print()
-
-    i.selectLeft()
-    i.print()
-    i.selectRight()
-    i.print()
-
-    i.shoot()
-    i.print()
-    
-    i.selectRight()
-    i.print()
-
-    i.shoot()
-    i.print()
-
-    i.selectRight()
-    i.print()
-
-    i.shoot()
-    i.print()
-
-    i.selectRight()
-    i.print()
-
-    i.shoot()
-    i.print()
-
-    i.selectRight()
-    i.print()
-
-    i.shoot()
-    i.print()
-
-    i.removeItem()
-    i.print()
-
-    i.removeItem()
-    i.print()
-
-    i.removeItem()
-    i.print()
-
-    i.removeItem()
-    i.print()
-
-    i.removeItem()
-    i.print()
-    
-
-
-
-
-
+explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
+guns = ['smg', 'pistol', 'siniper']
+keep = ['fiberWire']
 
 class Inventory:
     def __init__(self, grandparent):
@@ -76,9 +13,9 @@ class Inventory:
         self.maxInventory = {'smg': 100, 'pistol': 69, 'siniper':100}        
         self.inventory = {}
         self.updated = []
-        self.addItem('camera')
+        self.addItem('fiberWire')
         self.addItem('tnt')
-        self.addItem('gun',30)
+        #self.addItem('gun',30)
         self.visible = True
         self.interactDelay = 0
 
@@ -124,24 +61,21 @@ class Inventory:
 
     def selectLeft(self):
         self.updated = [self.updated[-1]] + self.updated[0:-1]
-        print("selected left: ")
         
     def selectRight(self):
         self.updated = self.updated[1:] + self.updated[:1]
-        print("selected Right: ")
     
     def update(self):
         # a short delay between interactions
         self.interactDelay -= 1
         
-
-
         # if v is pressed, toggle visibility
         keysPressed = pygame.key.get_pressed()
         if keysPressed[K_v] and self.interactDelay <= 0:
             self.visible = not self.visible
             self.interactDelay = 30
 
+        # everything below needs the inventory to be visible
         if not self.visible: return
         
         # rotate the carousel for directional keys
@@ -154,15 +88,28 @@ class Inventory:
             self.interactDelay = 20            
 
         # if e is pressed drop item:
-        if keysPressed[K_e] and self.interactDelay <= 0 and len(self.updated) > 0:
-            self.grandparent.addItem((self.grandparent.player.rect.center), self.updated[0])
+        if keysPressed[K_e] and self.updated[0] not in keep and self.interactDelay <= 0:
+            
+            if self.updated[0] in guns: self.shoot()
+            
+            elif self.updated[0] in explosives: 
+                self.grandparent.addExplosive((self.grandparent.player.rect.center), self.updated[0])
+                self.grandparent.items[-1].drop()
+            else: 
+                self.grandparent.addItem((self.grandparent.player.rect.center), self.updated[0])
+                self.grandparent.items[-1].drop()
+            print(self.grandparent.items)
+            
+            
             self.removeItem() # make sure to spawn the item in the map
             self.interactDelay = 20
             print(self.updated)
 
-        self.draw()
+        
 
-    def draw(self):
+        self.drawCarousel()
+
+    def drawCarousel(self):
         # draw a square at the bottom of the screen
         pygame.draw.rect(self.grandparent.screen, (255,255,255), (0, self.grandparent.height - 100, self.grandparent.width, 100))
         
@@ -172,16 +119,3 @@ class Inventory:
             self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 75))
         
         pygame.display.update()
-        
-
-if __name__ == "__main__":
-    main()
-        
-
-    # add object
-    # remove object
-    # selectLeft
-    # selectRight
-    # print
-
-    

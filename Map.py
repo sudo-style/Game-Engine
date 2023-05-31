@@ -40,6 +40,7 @@ class Map:
         #self.addItem((width/2, height/2), 'camera')
 
         self.addExplosive((width/2, height/2))
+        self.addNPC((width/2, height/2), 'clown')
 
 
     def addExplosive(self, pos, name = 'bomb'):
