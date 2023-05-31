@@ -69,8 +69,14 @@ class Player(Character):
         pygame.display.update()
         self.inputDelay -= 1
     
-    def shoot():
-        print('shoot')
+    def shoot(self):
+        # show a line from the player to the mouse
+        mouse_pos = pygame.mouse.get_pos()
+        delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
+        delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
+        angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
+        pygame.draw.line(self.parent.screen, white, self.rect.center, mouse_pos, 2)
+        
 
     def input(self):
         self.movement()

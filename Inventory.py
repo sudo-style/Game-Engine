@@ -85,11 +85,11 @@ class Inventory:
             self.visible = not self.visible
             self.interactDelay = 30
 
-        self.drawAmmo()
-        pygame.display.update()
+        self.drawAmmo() # only draws when gun is selected
 
         # everything below needs the inventory to be visible
         if not self.visible: return
+        self.drawCarousel()
 
         # rotate the carousel for directional keys
         if keysPressed[K_LEFT] and self.interactDelay <= 0:
@@ -103,7 +103,13 @@ class Inventory:
         # if e is pressed drop item:
         if keysPressed[K_e] and self.updated[0] not in keep and self.interactDelay <= 0:
             
-            if self.updated[0] in guns: self.shoot()
+            if self.updated[0] in guns: 
+                # if can shoot, then shoot
+                if self.inventory[self.updated[0]] > 0:
+                    self.shoot()
+                    self.grandparent.player.shoot()
+                self.interactDelay = 20 # should determined by the gun
+                return 
             
             elif self.updated[0] in explosives: 
                 self.grandparent.addExplosive((self.grandparent.player.rect.center), self.updated[0])
@@ -117,7 +123,7 @@ class Inventory:
             self.interactDelay = 20
             print(self.updated)
         
-        self.drawCarousel()
+        
         
 
     def drawCarousel(self):
