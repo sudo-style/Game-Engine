@@ -26,6 +26,7 @@ class Character(pygame.sprite.Sprite):
         self.oxygen = 100
         self.KO = False
         self.suitName = name
+        
 
     def update(self):
         # if an NPC and a player collide then print "hello"
@@ -57,13 +58,14 @@ class Player(Character):
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
         self.inventory = Inventory(self.parent)
-        self.inventoryPause = 0
+        self.inputDelay = 0
 
     def update(self):
         self.input()
         self.draw()
         self.rect.center += self.direction * self.speed
         self.inventory.update()
+        self.inputDelay -= 1
 
     def input(self):
         self.movement()
@@ -75,7 +77,8 @@ class Player(Character):
             self.weapon()
             print("pressed m")
 
-        if keysPressed[K_t]:
+        if keysPressed[K_t] and self.inputDelay < 0:
+            self.inputDelay = 30
             self.takeDisguise()
             
 
