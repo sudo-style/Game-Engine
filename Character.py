@@ -70,14 +70,65 @@ class Player(Character):
         self.inputDelay -= 1
     
     def shoot(self):
-        # show a line from the player to the mouse
+        # Get the player's position
+        player_pos = self.rect.center
         mouse_pos = pygame.mouse.get_pos()
-        delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
-        delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
-        angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
-        pygame.draw.line(self.parent.screen, white, self.rect.center, mouse_pos, 2)
-        
 
+        # Calculate the ray direction
+        delta_x = mouse_pos[0] - player_pos[0] + self.group.offset.x
+        delta_y = mouse_pos[1] - player_pos[1] + self.group.offset.y
+        playerToMouseAngle = math.atan2(delta_y, delta_x)
+
+        # Calculate a long line endpoint based on the ray direction
+        line_length = 1000  # Adjust the line length as needed
+        line_endpoint_x = player_pos[0] + line_length * math.cos(angle)
+        line_endpoint_y = player_pos[1] + line_length * math.sin(angle)
+        line_endpoint = (line_endpoint_x, line_endpoint_y)
+
+        # Initialize the closest NPC and its distance
+        closest_npc = None
+        closest_distance = float('inf')
+
+        # will shoot all of the NPCs in the line of sight
+        if self.inventory.currentWeapon() == 'sniper':
+            furthestDistance = 0
+            # Check the raycast against each NPC object
+            for npc in self.parent.npcs:
+                npc_pos = npc.rect.center
+                distance = math.sqrt((player_pos[0] - npc_pos[0])**2 + (player_pos[1] - npc_pos[1])**2)
+
+                # Calculate the angle between the NPC and the player
+                npcToPlayer_angle = math.atan2(npc_pos[1] - player_pos[1], npc_pos[0] - player_pos[0])
+                angle_difference = abs(playerToMouseAngle - npcToPlayer_angle)
+
+                # if angle is smaller than 10 degrees, then npc is in the line of sight
+                if angle_difference <= math.radians(10):
+                    if distance > furthestDistance: 
+                        furthestDistance = distance
+                        line_endpoint = npc_pos
+                    npc.ko()
+            pygame.draw.line(self.parent.screen, white, player_pos, line_endpoint, 2)
+            return
+        
+        else: # shoots the closest NPC in the line of sight
+            for npc in self.parent.npcs:
+                npc_pos = npc.rect.center
+                distance = math.sqrt((player_pos[0] - npc_pos[0])**2 + (player_pos[1] - npc_pos[1])**2)
+
+                # Check if the NPC is closer than the previous closest NPC
+                if distance < closest_distance:
+                    # Calculate the angle between the NPC and the player
+                    npcToPlayer_angle = math.atan2(npc_pos[1] - player_pos[1], npc_pos[0] - player_pos[0])
+                    angle_difference = abs(playerToMouseAngle - npcToPlayer_angle)
+
+                    # if angle is smaller than 10 degrees, then npc is in the line of sight
+                    if angle_difference <= math.radians(10):
+                        closest_distance = distance
+                        line_endpoint = npc_pos
+                        closest_npc = npc            
+            if closest_npc != None: closest_npc.ko()
+            pygame.draw.line(self.parent.screen, white, player_pos, line_endpoint, 2)
+        
     def input(self):
         self.movement()
         self.mouseRotation()

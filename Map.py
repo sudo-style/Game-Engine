@@ -29,7 +29,6 @@ class Map:
         self.player = Player((width/2, height/2), self.camera_group, self, 'player')
         
         # adding an npc to the map
-        
         self.addExplosive((width/2, height/2))
         self.addCharacter((width/2, height/2), 'clown')
         self.addItem((width/2-200, height/2+ 100), 'gun', 5)
