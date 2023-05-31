@@ -125,7 +125,6 @@ class Player(Character):
         delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
         delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
         self.angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
-
     
     def draw(self):
         # rotate the image
@@ -137,3 +136,34 @@ class Player(Character):
 
         if self.inventory.visible: self.inventory.drawCarousel()
         pygame.display.update()
+
+class NPC(Character):
+    def __init__(self, pos, group, parent, name = "guard"):
+        super().__init__(pos, group, parent, name)
+        self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
+        self.statesIndex = 1
+        self.waypoints = [(0,0), (100, 100), (200, 200)]
+        self.waypointIndex = 0
+
+    def update(self):
+        if self.states[self.statesIndex] == 'patrol':    
+            self.patrol()
+    
+    def patrol(self):
+        # move towards the next waypoint
+        self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1] - self.rect.centery)
+        if self.direction.length() > 0:
+            self.direction.normalize_ip()
+        self.rect.center += self.direction * self.speed
+
+        # if the npc reaches the waypoint, move to the next waypoint
+        # check if the npc's collider is touching an x,y coordinate   
+        # 
+        if self.rect.collidepoint(self.waypoints[self.waypointIndex]):
+            self.waypointIndex += 1
+            if self.waypointIndex >= len(self.waypoints): self.waypointIndex = 0
+
+    def ko(self):
+        self.image = self.ko_image
+        self.KO = True
+        self.statesIndex = 5
