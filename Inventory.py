@@ -31,6 +31,9 @@ class Inventory:
         if item in self.maxInventory:
             self.inventory[item] = min(self.inventory[item],self.maxInventory[item])
 
+    def currentWeapon(self):
+        return self.updated[0]
+
     def removeItem(self):
         if len(self.updated) <= 0: return
     

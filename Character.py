@@ -20,6 +20,7 @@ class Character(pygame.sprite.Sprite):
         self.parent = parent
         self.health = 100
         self.name = name
+        self.KO = False
         
     def update(self):
         # if an NPC and a player collide then print "hello"
@@ -47,20 +48,31 @@ class Player(Character):
         self.rect.center += self.direction * self.speed
         self.inventory.update()
     
-    def draw(self):
-        # rotate the image
-        oldCenter = self.rect.center
-        self.oldCenter = oldCenter
-        self.image = pygame.transform.rotate(self.original_image, -self.angle)
-        self.rect = self.image.get_rect()
-        self.rect.center = oldCenter
-
-        if self.inventory.visible: self.inventory.drawCarousel()
-        pygame.display.update()
 
     def input(self):
         self.movement()
         self.mouseRotation()
+        
+        # if m is pressed,
+        keysPressed = pygame.key.get_pressed()
+        if keysPressed[K_m]:
+            self.weapon()
+            print("pressed m")
+    
+    def weapon(self):
+        # strangle if NPC is close enough
+        if self.inventory.currentWeapon() == 'fiberWire':
+            # check if npc is close to players
+            for npc in self.parent.npcs:                
+                if self.rect.colliderect(npc.rect):
+                    # if player clicks on npc then print "strangle"
+                    self.strangle(npc)
+                    npc.KO = True
+
+
+    def strangle(self, npc):
+        # drag the npc to the player
+        npc.rect.center = self.rect.center
         
     def movement(self):
         keysPressed = pygame.key.get_pressed()
@@ -82,3 +94,15 @@ class Player(Character):
         delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
         delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
         self.angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
+
+    
+    def draw(self):
+        # rotate the image
+        oldCenter = self.rect.center
+        self.oldCenter = oldCenter
+        self.image = pygame.transform.rotate(self.original_image, -self.angle)
+        self.rect = self.image.get_rect()
+        self.rect.center = oldCenter
+
+        if self.inventory.visible: self.inventory.drawCarousel()
+        pygame.display.update()
