@@ -27,7 +27,6 @@ class Character(pygame.sprite.Sprite):
         self.KO = False
         self.suitName = name
         
-
     def update(self):
         # if an NPC and a player collide then print "hello"
         if self.parent.player.rect.colliderect(self.rect):
@@ -45,7 +44,7 @@ class Character(pygame.sprite.Sprite):
         self.image = self.ko_image
         self.KO = True
 
-    def gettingStrangled(self):
+    def gettingSubdued(self):
         # oxygen decreases when getting strangled
         self.oxygen -= 2
         if self.oxygen <= 0: 
@@ -54,9 +53,6 @@ class Character(pygame.sprite.Sprite):
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
-        self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
-        self.original_image = self.image.copy()
-        self.rect = self.image.get_rect(center = pos)
         self.inventory = Inventory(self.parent)
         self.inputDelay = 0
 
@@ -73,15 +69,14 @@ class Player(Character):
         
         # if m is pressed,
         keysPressed = pygame.key.get_pressed()
-        if keysPressed[K_m]:
+ 
+        if keysPressed[K_b]:
             self.weapon()
-            print("pressed m")
-
+ 
         if keysPressed[K_t] and self.inputDelay < 0:
             self.inputDelay = 30
             self.takeDisguise()
             
-
     def takeDisguise(self):
         # check if player is close to the suit
         for npc in self.parent.npcs:
@@ -97,28 +92,17 @@ class Player(Character):
                     self.rect = self.image.get_rect(center = self.rect.center)
                     
     def weapon(self):
-        # strangle if NPC is close enough
+        # subdue if NPC is close enough
         if self.inventory.currentWeapon() == 'fiberWire':
             # check if npc is close to players
             for npc in self.parent.npcs:                
                 if self.rect.colliderect(npc.rect):
-                    # if player clicks on npc then print "strangle"
-                    self.strangle(npc)
-                    print(npc.oxygen)
-    
-    def suitUp(self):
-        # check if player is close to the suit
-        for item in self.parent.items:
-            if self.rect.colliderect(item.rect):
-                # if player clicks on suit then print "suit up"
-                self.inventory.addItem(item.name)
-                item.kill()
-                print("suit up")
+                    # subdue the npc
+                    self.subdue(npc)
 
-
-    def strangle(self, npc):
+    def subdue(self, npc):
         # drag the npc to the player
-        npc.gettingStrangled()
+        npc.gettingSubdued()
         npc.rect.center = self.rect.center
         
     def movement(self):

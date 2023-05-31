@@ -39,7 +39,7 @@ class Inventory:
     
         item = self.updated[0]
         print("removing: " + item)
-        
+
         isGun = item in self.maxInventory
         willRemoveAll = self.inventory[item] <= 1
         if isGun or willRemoveAll:
