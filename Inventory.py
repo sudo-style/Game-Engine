@@ -102,7 +102,6 @@ class Inventory:
 
         # if e is pressed drop item:
         if keysPressed[K_e] and self.updated[0] not in keep and self.interactDelay <= 0:
-            
             if self.updated[0] in guns: 
                 # if can shoot, then shoot
                 if self.inventory[self.updated[0]] > 0:
@@ -122,9 +121,6 @@ class Inventory:
             self.removeItem() # make sure to spawn the item in the map
             self.interactDelay = 20
             print(self.updated)
-        
-        
-        
 
     def drawCarousel(self):
         # draw a square at the bottom of the screen
