@@ -4,7 +4,7 @@ import os
 import math
 
 explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
-guns = ['smg', 'pistol', 'siniper']
+guns = ['smg', 'pistol', 'siniper', 'gun']
 keep = ['fiberWire']
 
 class Inventory:
@@ -116,6 +116,6 @@ class Inventory:
         # draw the items
         for i in range(len(self.updated)):
             item = self.updated[i]
-            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", item + ".png")), (i*100, self.grandparent.height - 75))
+            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", 'items', item + ".png")), (i*100, self.grandparent.height - 75))
         
         pygame.display.update()

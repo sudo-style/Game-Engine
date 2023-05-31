@@ -5,7 +5,7 @@ import os
 class Item(pygame.sprite.Sprite):
     def __init__(self, pos, group, parent, name= "fiberWire"):
         super().__init__(group)
-        self.image = pygame.image.load(os.path.join("sprites", name +".png")).convert_alpha()
+        self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         self.name = name
@@ -16,7 +16,7 @@ class Item(pygame.sprite.Sprite):
 class Explosive(Item):
     def __init__(self, pos, group, parent, name = "bomb"):
         super().__init__(pos, group, parent, name)
-        self.image = pygame.image.load(os.path.join("sprites", name +".png")).convert_alpha()
+        self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         

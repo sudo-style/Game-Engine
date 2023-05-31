@@ -20,7 +20,7 @@ class Map:
         self.rooms = []
         self.items = []
         self.npcs = []
-        self.original_sprite = pygame.image.load(os.path.join("sprites", "GroundFloor.png"))
+        self.original_sprite = pygame.image.load(os.path.join("sprites", 'map', "GroundFloor.png"))
         self.sprite = self.original_sprite.copy()
         
         self.width = width

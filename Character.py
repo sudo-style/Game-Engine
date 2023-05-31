@@ -9,8 +9,10 @@ class Character(pygame.sprite.Sprite):
     def __init__(self, pos, group, parent, name = "clown"):
         super().__init__(group)
         self.name = name
-        self.image = pygame.image.load(os.path.join('sprites',name + '.png')).convert_alpha()
-        self.ko_image = pygame.image.load(os.path.join('sprites','ko.png')).convert_alpha()
+        self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
+        self.ko_image = pygame.image.load(os.path.join('sprites','character', name, 'ko.png')).convert_alpha()
+        self.naked_image = pygame.image.load(os.path.join('sprites','character', name, 'naked.png')).convert_alpha()
+        
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
         self.direction = pygame.math.Vector2()
@@ -50,7 +52,7 @@ class Character(pygame.sprite.Sprite):
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
-        self.image = pygame.image.load(os.path.join('sprites',name + '.png')).convert_alpha()
+        self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
         self.inventory = Inventory(self.parent)
@@ -83,9 +85,10 @@ class Player(Character):
                 # if player clicks on suit then print "suit up"
                 if npc.KO:
                     # take the disguise
-                    self.image = pygame.image.load(os.path.join('sprites',npc.name + '.png')).convert_alpha()
+                    self.image = pygame.image.load(os.path.join('sprites', 'character', npc.name, npc.name + '.png')).convert_alpha()
+
                     self.original_image = self.image.copy()
-                    npc.image = pygame.image.load(os.path.join('sprites','naked.png')).convert_alpha()
+                    npc.image = npc.naked_image
     
     def weapon(self):
         # strangle if NPC is close enough
