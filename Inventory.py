@@ -135,3 +135,5 @@ class Inventory:
             item = self.updated[i]
             self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", 'items', item + ".png")), (i*100, self.grandparent.height - 75))
 
+
+
