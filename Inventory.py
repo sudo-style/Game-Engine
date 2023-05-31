@@ -100,12 +100,9 @@ class Inventory:
                 self.grandparent.items[-1].drop()
             print(self.grandparent.items)
             
-            
             self.removeItem() # make sure to spawn the item in the map
             self.interactDelay = 20
             print(self.updated)
-
-        
 
         self.drawCarousel()
 

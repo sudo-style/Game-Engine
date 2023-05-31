@@ -24,10 +24,15 @@ class Explosive(Item):
         self.radius = 100
         self.fuseTime = 200
         self.boolTriggered = False
+
+        # sound
+        self.sound = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
+        self.fuse = pygame.mixer.Sound(os.path.join("sounds", "fuse.mp3"))
     
     def drop(self):
         print(f"dropped Explosive {self.name}")
         self.boolTriggered = True
+        self.fuse.play()
 
 
     def update(self):
@@ -40,6 +45,7 @@ class Explosive(Item):
             self.fuseTime -= 1
             if (self.fuseTime <= 0):
                 self.explode()
+                self.sound.play()
     
     def explode(self):
         # TODO: add explosion animation
@@ -55,5 +61,6 @@ class Explosive(Item):
         
     def dropped(self):
         self.boolTriggered = True
+        self.fuse.play()
 
         
