@@ -29,12 +29,6 @@ class Character(pygame.sprite.Sprite):
         self.suitName = name
         
     def update(self):
-        # if an NPC and a player collide then print "hello"
-        if self.parent.player.rect.colliderect(self.rect):
-            # if player clicks on the NPC then print "hello"
-            if pygame.mouse.get_pressed()[0]:
-                print("hello")
-
         # lets the NPC breathe oxygen if not getting strangled and not KO yet
         self.breathing()
         if self.health <= 0: self.kill()
@@ -81,8 +75,8 @@ class Player(Character):
 
         # Calculate a long line endpoint based on the ray direction
         line_length = 1000  # Adjust the line length as needed
-        line_endpoint_x = player_pos[0] + line_length * math.cos(angle)
-        line_endpoint_y = player_pos[1] + line_length * math.sin(angle)
+        line_endpoint_x = player_pos[0] + line_length * math.cos(playerToMouseAngle)
+        line_endpoint_y = player_pos[1] + line_length * math.sin(playerToMouseAngle)
         line_endpoint = (line_endpoint_x, line_endpoint_y)
 
         # Initialize the closest NPC and its distance
