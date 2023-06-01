@@ -4,6 +4,7 @@ from pygame.locals import *
 
 from Map import Map
 from CameraGroup import CameraGroup
+from GameObject import GameObject
 
 def main():
     pygame.init()

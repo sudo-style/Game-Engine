@@ -2,11 +2,12 @@ import pygame
 from pygame.locals import *
 import os
 from Inventory import Inventory
+from GameObject import GameObject
 import math
 import copy
 
 white = (255, 255, 255)
-class Character(pygame.sprite.Sprite):
+class Character(pygame.sprite.Sprite, GameObject):
     def __init__(self, pos, group, parent, name):
         super().__init__(group)
         self.name = name
@@ -88,7 +89,7 @@ class Player(Character):
             # Check the raycast against each NPC object
             for npc in self.parent.npcs:
                 npc_pos = npc.rect.center
-                distance = math.sqrt((player_pos[0] - npc_pos[0])**2 + (player_pos[1] - npc_pos[1])**2)
+                distance = self.distanceTo(npc)
 
                 # Calculate the angle between the NPC and the player
                 npcToPlayer_angle = math.atan2(npc_pos[1] - player_pos[1], npc_pos[0] - player_pos[0])

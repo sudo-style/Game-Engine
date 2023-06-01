@@ -1,8 +1,9 @@
 import pygame
 from pygame.locals import *
 import os
+from GameObject import GameObject
 
-class Item(pygame.sprite.Sprite):
+class Item(pygame.sprite.Sprite, GameObject):
     def __init__(self, pos, group, parent, name, count= 1):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()

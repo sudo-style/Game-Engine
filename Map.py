@@ -6,6 +6,7 @@ from random import randint
 
 from Item import Item, Explosive
 from Character import Character, Player, NPC
+from GameObject import GameObject
 
 class Map:
     def __init__(self, name, width, height, screen, clock, fps, camera_group):
