@@ -6,6 +6,7 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, pos, group, parent, name, count= 1):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
+        self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         self.name = name
@@ -14,7 +15,6 @@ class Item(pygame.sprite.Sprite):
     
     def drop(self):
         print(f"dropped {self.name}")
-
     
     def pickUp(self):
         print(f"picked up {self.name}")
@@ -50,7 +50,7 @@ class Explosive(Item):
         self.boolTriggered = False
         
         # sound
-        self.sound = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
+        self.explode = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
         self.fuse = pygame.mixer.Sound(os.path.join("sounds", "fuse.mp3"))
     
     def drop(self):
@@ -73,18 +73,28 @@ class Explosive(Item):
             self.fuseTime -= 1
             if (self.fuseTime <= 0):
                 self.explode()
-                self.sound.play()
+                
     
     def explode(self):
+        self.explode.play()
+
         # draw the damage and sound radius
         pygame.draw.circle(self.parent.screen, (255,0,0), self.rect.center, self.damageRadius)
         pygame.draw.circle(self.parent.screen, (0,0,255), self.rect.center, self.soundRadius, 1)
         pygame.display.update()
 
+        # check any characters in the sound radius
+        # TODO this needs to use the radius of the sound
+        for npc in self.parent.npcs:
+            # check if the npc is in the radius of sound
+            if (self.rect.colliderect(npc.rect)):
+                npc.setState('alert')
+
         # check any characters in the radius
-        for character in self.parent.npcs:
-            if (self.rect.colliderect(character.rect)):
-                character.health -= self.damage
+        # TODO this doesn't work either
+        for npc in self.parent.npcs:
+            if (self.rect.colliderect(npc.rect)):
+                npc.health -= self.damage
         
         # explode explosives in the radius
         for explosive in self.parent.items:

@@ -31,13 +31,16 @@ class Inventory:
         if item in self.maxInventory:
             self.inventory[item] = min(self.inventory[item],self.maxInventory[item])
 
+    def currentWeaponsCount(self):
+        return self.inventory[self.currentWeapon()]
+    
     def currentWeapon(self):
         return self.updated[0]
 
     def removeItem(self):
         if len(self.updated) <= 0: return
     
-        item = self.updated[0]
+        item = self.currentWeapon()
         print("removing: " + item)
 
         isGun = item in self.maxInventory
@@ -49,7 +52,7 @@ class Inventory:
         self.inventory[item]-=1 
 
     def shoot(self):
-        gun = self.updated[0]
+        gun = self.currentWeapon()
         print("trying to shoot " + gun)
         if not gun in self.maxInventory:
             print("not a gun")
@@ -70,7 +73,7 @@ class Inventory:
 
     def drawAmmo(self):
         if self.currentWeapon() in guns:
-            ammo = self.inventory[self.currentWeapon()]                                                 # gets the amount of ammo
+            ammo = self.currentWeaponsCount()                                               # gets the amount of ammo
             font = pygame.font.SysFont('arial', 30)                                                     # creates a font
             text = font.render(f"Ammo: {ammo}", True, (255, 255, 255))                                  # creates the text
             self.grandparent.screen.blit(text, (self.grandparent.width - text.get_width() - 10, 10))    # Blit the text onto the main screen
@@ -78,6 +81,7 @@ class Inventory:
     def update(self):
         # a short delay between interactions
         self.interactDelay -= 1
+        currentWeapon = self.currentWeapon()
         
         # if v is pressed, toggle visibility
         keysPressed = pygame.key.get_pressed()
@@ -101,20 +105,20 @@ class Inventory:
             self.interactDelay = 20            
 
         # if e is pressed drop item:
-        if keysPressed[K_e] and self.updated[0] not in keep and self.interactDelay <= 0:
-            if self.updated[0] in guns: 
+        if keysPressed[K_e] and currentWeapon not in keep and self.interactDelay <= 0:
+            if currentWeapon in guns: 
                 # if can shoot, then shoot
-                if self.inventory[self.updated[0]] > 0:
+                if self.inventory[currentWeapon] > 0:
                     self.shoot()
                     self.grandparent.player.shoot()
                 self.interactDelay = 20 # should determined by the gun
                 return 
             
-            elif self.updated[0] in explosives: 
-                self.grandparent.addExplosive((self.grandparent.player.rect.center), self.updated[0])
+            elif currentWeapon in explosives: 
+                self.grandparent.addExplosive((self.grandparent.player.rect.center), currentWeapon)
                 self.grandparent.items[-1].drop()
             else: 
-                self.grandparent.addItem((self.grandparent.player.rect.center), self.updated[0])
+                self.grandparent.addItem((self.grandparent.player.rect.center), currentWeapon)
                 self.grandparent.items[-1].drop()
             print(self.grandparent.items)
             

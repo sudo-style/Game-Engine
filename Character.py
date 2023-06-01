@@ -37,7 +37,6 @@ class Character(pygame.sprite.Sprite):
         self.image = self.ko_image
         self.KO = True
 
-
     def gettingSubdued(self):
         # oxygen decreases when getting strangled
         self.oxygen -= 2
@@ -152,17 +151,20 @@ class Player(Character):
                     self.rect = self.image.get_rect(center = self.rect.center)
                     
     def weaponAttack(self):
+        currentWeapon = self.inventory.currentWeapon()
+
         # subdue if NPC is close enough
-        if self.inventory.currentWeapon() == 'fiberWire':
+        if currentWeapon == 'fiberWire':
             # check if npc is close to players
             for npc in self.parent.npcs:                
                 if self.rect.colliderect(npc.rect):
                     # subdue the npc
                     self.subdue(npc)
         
-        if self.inventory.currentWeapon() == 'gun':
-            self.shoot()
-            pass
+        if currentWeapon == 'gun':
+            # if the player has bullets in the gun
+            if self.inventory.currentWeaponsCount() > 0:
+                self.shoot()
 
     def subdue(self, npc):
         # drag the npc to the player
@@ -233,6 +235,10 @@ class NPC(Character):
         if self.waypointIndex >= len(self.waypoints):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
+
+    def setState(self, state):
+        if state in self.states:
+            self.statesIndex = self.states.index(state)
 
     def combat(self):
         # shoot at the player
