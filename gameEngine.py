@@ -1,8 +1,7 @@
 import pygame, sys, os, math
 from pygame.locals import *
 
-from Item import Item
-from Character import Player
+
 from Map import Map
 from CameraGroup import CameraGroup
 

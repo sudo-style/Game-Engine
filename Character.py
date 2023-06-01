@@ -212,11 +212,11 @@ class NPC(Character):
         self.searchPos = pygame.Vector2()
 
     def update(self):
-        self.waypointsControler() # controls movements of the NPC
+        self.waypointsController() # controls movements of the NPC
         self.breathing()
         if self.health <= 0: self.kill()
 
-    def waypointsControler(self):
+    def waypointsController(self):
         state = self.getState()
         
         if state == 'ko': 

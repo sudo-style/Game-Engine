@@ -43,7 +43,9 @@ class Explosive(Item):
         self.parent = parent
         
         self.damage = 100
-        self.radius = 100
+        self.damageRadius = 100
+        self.soundRadius = 300
+
         self.fuseTime = 200
         self.boolTriggered = False
         
@@ -60,10 +62,10 @@ class Explosive(Item):
         # trigger the explosive if the player is close enough
         self.pickUpTime -= 1
         if self.parent.player.rect.colliderect(self.rect):
-            if pygame.mouse.get_pressed()[0]:
-                self.boolTriggered = True
+            if pygame.mouse.get_pressed()[0] and self.pickUpTime <= 0:
                 self.fuse.play()
-            
+                self.boolTriggered = True
+                self.pickUpTime = 20
             # if p is pressed then pick up
             self.tryPickUp()
                 
@@ -74,7 +76,11 @@ class Explosive(Item):
                 self.sound.play()
     
     def explode(self):
-        # TODO: add explosion animation        
+        # draw the damage and sound radius
+        pygame.draw.circle(self.parent.screen, (255,0,0), self.rect.center, self.damageRadius)
+        pygame.draw.circle(self.parent.screen, (0,0,255), self.rect.center, self.soundRadius, 1)
+        pygame.display.update()
+
         # check any characters in the radius
         for character in self.parent.npcs:
             if (self.rect.colliderect(character.rect)):
