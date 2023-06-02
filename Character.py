@@ -42,19 +42,18 @@ class Character(pygame.sprite.Sprite, GameObject):
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
 
-    def ko(self):
-        self.image = self.ko_image
-        self.KO = True
+    def breathing(self):
+        self.oxygen += 1
+        self.oxygen = min(self.oxygen, 100)
 
     def gettingSubdued(self):
         # oxygen decreases when getting strangled
         self.oxygen -= 2
         if self.oxygen <= 0: 
             self.ko()
-    
-    def breathing(self):
-        self.oxygen += 1
-        if self.oxygen > 100: self.oxygen = 100
+
+    def getState(self):
+        return self.states[self.statesIndex]
 
     def setState(self, state):
         if state in self.states:
@@ -64,6 +63,79 @@ class Character(pygame.sprite.Sprite, GameObject):
         # random position within the radius
         radius = radius / 4 # closer but with small variation
         self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
+
+
+    def waypointsController(self): # priority queue
+        state = self.getState()
+        
+        # if knocked out, then can't do anything else
+        if state == 'ko': return 
+        
+        if state == 'alert': 
+            self.alert()
+            return
+
+        if state == 'search':
+            self.search()  # move towards the position of the sound
+            return
+        
+        if state == 'combat':
+            self.combat()
+            return
+
+        # if no special conditions are met, then this is the default state of the path of the NPC
+        state = self.waypoints[self.waypointIndex][0]
+        if state == 'patrol': self.patrol()  # move towards the next waypoint
+        if state == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
+
+        # goes to the begining of the path
+        if self.waypointIndex >= len(self.waypoints):
+            self.waypointIndex = 0
+            self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
+
+    def ko(self):
+        self.image = self.ko_image
+        self.KO = True
+        self.setState('ko')
+
+    def alert(self):
+        # be idle for a couple seconds, then go to the position of the alert sound
+
+        # make a new waypoint for the NPC
+        self.waypoints = [['idle', 200], ['patrol', self.searchPos], ['idle', 200]]
+        self.waypointIndex = 0
+        self.setState('patrol')
+
+    def search(self):
+        # try to find the player for a couple seconds, otherwise go back to patrol
+        #self.waypoints = [['idle', 200], ['dir', 225], ['idle', 200],['dir', 315]]
+        #self.waypointIndex = 0
+        self.direction = self.getDirectionTo(self.searchPos)
+        if self.direction.length() > 0:
+            self.direction.normalize_ip()
+        self.rect.center += self.direction * self.speed
+
+
+        # if the NPC is close to the player then go into combat mode
+        player = self.parent.player
+        angleNPCtoPlayer = self.getDirectionTo(player)
+        if self.isInLineOfSight(player, angleNPCtoPlayer, 10):
+            print("Lets throw hands")
+            self.setState('combat')
+        
+
+    def patrol(self):
+        self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][1][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1][1] - self.rect.centery)
+        if self.direction.length() > 0:
+            self.direction.normalize_ip()
+        self.rect.center += self.direction * self.speed
+        # rotate the image to face the direction of the movement
+        self.angle = (180 / math.pi) * math.atan2(self.direction.y, self.direction.x)
+        self.image = pygame.transform.rotate(self.original_image, -self.angle)
+        self.rect = self.image.get_rect(center = self.rect.center)
+
+        if self.rect.collidepoint(self.waypoints[self.waypointIndex][1]):
+            self.waypointIndex += 1
     
     def idle(self):
         self.waypoints[self.waypointIndex][1] -= 1
@@ -234,80 +306,6 @@ class NPC(Character):
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
 
-    def waypointsController(self): # priority queue
-        state = self.getState()
-        
-        # if knocked out, then can't do anything else
-        if state == 'ko': return 
-        
-        if state == 'alert': 
-            self.alert()
-            return
-
-        if state == 'search':
-            self.search()  # move towards the position of the sound
-            return
-        
-        if state == 'combat':
-            self.combat()
-            return
-
-        # if no special conditions are met, then this is the default state of the path of the NPC
-        state = self.waypoints[self.waypointIndex][0]
-        if state == 'patrol': self.patrol()  # move towards the next waypoint
-        if state == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
-
-        # goes to the begining of the path
-        if self.waypointIndex >= len(self.waypoints):
-            self.waypointIndex = 0
-            self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
-
-    def alert(self):
-        # be idle for a couple seconds, then go to the position of the alert sound
-
-        # make a new waypoint for the NPC
-        self.waypoints = [['idle', 200], ['patrol', self.searchPos], ['idle', 200]]
-        self.waypointIndex = 0
-        self.setState('patrol')
-
     def combat(self):
         # shoot at the player
         pass
-
-    def getState(self):
-        return self.states[self.statesIndex]
-
-    def search(self):
-        # try to find the player for a couple seconds, otherwise go back to patrol
-        #self.waypoints = [['idle', 200], ['dir', 225], ['idle', 200],['dir', 315]]
-        #self.waypointIndex = 0
-        self.direction = self.getDirectionTo(self.searchPos)
-        if self.direction.length() > 0:
-            self.direction.normalize_ip()
-        self.rect.center += self.direction * self.speed
-
-
-        # if the NPC is close to the player then go into combat mode
-        player = self.parent.player
-        angleNPCtoPlayer = self.getDirectionTo(player)
-        if self.isInLineOfSight(player, angleNPCtoPlayer, 10):
-            print("Lets throw hands")
-            self.setState('combat')
-        
-    def patrol(self):
-        self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][1][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1][1] - self.rect.centery)
-        if self.direction.length() > 0:
-            self.direction.normalize_ip()
-        self.rect.center += self.direction * self.speed
-        # rotate the image to face the direction of the movement
-        self.angle = (180 / math.pi) * math.atan2(self.direction.y, self.direction.x)
-        self.image = pygame.transform.rotate(self.original_image, -self.angle)
-        self.rect = self.image.get_rect(center = self.rect.center)
-
-        if self.rect.collidepoint(self.waypoints[self.waypointIndex][1]):
-            self.waypointIndex += 1
-
-    def ko(self):
-        self.image = self.ko_image
-        self.KO = True
-        self.setState('ko')
