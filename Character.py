@@ -1,10 +1,11 @@
-import pygame
+import pygame 
 from pygame.locals import *
 import os
 from Inventory import Inventory
 from GameObject import GameObject
-import math
+import math 
 import copy
+from random import randint
 
 white = (255, 255, 255)
 class Character(pygame.sprite.Sprite, GameObject):
@@ -14,6 +15,7 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
         self.ko_image = pygame.image.load(os.path.join('sprites','character', name, 'ko.png')).convert_alpha()
         self.naked_image = pygame.image.load(os.path.join('sprites','character', name, 'naked.png')).convert_alpha()
+        self.searchPos = pygame.Vector2()
         
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
@@ -57,6 +59,12 @@ class Character(pygame.sprite.Sprite, GameObject):
     def setState(self, state):
         if state in self.states:
             self.statesIndex = self.states.index(state)
+
+    def setSearchPos(self, pos, radius):
+        # random position within the radius
+        radius = radius / 4 # closer but with small variation
+        self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
+        
 
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
@@ -225,7 +233,7 @@ class NPC(Character):
         self.waypoints = [['patrol', (0, 0)], ['idle', 200], ['patrol', (100, 100)], ['patrol', (200, 200)], ['patrol', (self.parent.width, self.parent.height)], ['idle', 100]]
         self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.waypointIndex = 0
-        self.searchPos = pygame.Vector2()
+        
 
     def update(self):
         self.waypointsController() # controls movements of the NPC
@@ -236,8 +244,6 @@ class NPC(Character):
     def waypointsController(self): # priority queue
         state = self.getState()
         
-        print(state)
-
         # if knocked out, then can't do anything else
         if state == 'ko': return 
         
@@ -263,14 +269,15 @@ class NPC(Character):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
 
-    def setSearchPos(self, pos, radius):
-        # random position within the radius
-        radius = radius / 4 # closer but with small variation
-        self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
+    
 
-    def alert():
+    def alert(self):
         # be idle for a couple seconds, then go to the position of the alert sound
-        pass    
+
+        # make a new waypoint for the NPC
+        self.waypoints = [['idle', 200], ['patrol', self.searchPos], ['idle', 200]]
+        self.waypointIndex = 0
+        self.setState('patrol')
 
     def combat(self):
         # shoot at the player
