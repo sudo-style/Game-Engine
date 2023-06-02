@@ -64,7 +64,12 @@ class Character(pygame.sprite.Sprite, GameObject):
         # random position within the radius
         radius = radius / 4 # closer but with small variation
         self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
-        
+    
+    def idle(self):
+        self.waypoints[self.waypointIndex][1] -= 1
+        if self.waypoints[self.waypointIndex][1] <= 0:
+            self.waypointIndex += 1
+
 
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
@@ -233,7 +238,6 @@ class NPC(Character):
         self.waypoints = [['patrol', (0, 0)], ['idle', 200], ['patrol', (100, 100)], ['patrol', (200, 200)], ['patrol', (self.parent.width, self.parent.height)], ['idle', 100]]
         self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.waypointIndex = 0
-        
 
     def update(self):
         self.waypointsController() # controls movements of the NPC
@@ -269,8 +273,6 @@ class NPC(Character):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
 
-    
-
     def alert(self):
         # be idle for a couple seconds, then go to the position of the alert sound
 
@@ -294,19 +296,17 @@ class NPC(Character):
 
         # if the NPC is close to the player then go into combat mode
         if self.rect.colliderect(self.parent.player.rect):
-            self.statesIndex = 4
-
-
-    def idle(self):
-        self.waypoints[self.waypointIndex][1] -= 1
-        if self.waypoints[self.waypointIndex][1] <= 0:
-            self.waypointIndex += 1
+            self.setState('combat')
 
     def patrol(self):
         self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][1][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1][1] - self.rect.centery)
         if self.direction.length() > 0:
             self.direction.normalize_ip()
         self.rect.center += self.direction * self.speed
+        # rotate the image to face the direction of the movement
+        self.angle = (180 / math.pi) * math.atan2(self.direction.y, self.direction.x)
+        self.image = pygame.transform.rotate(self.original_image, -self.angle)
+        self.rect = self.image.get_rect(center = self.rect.center)
 
         if self.rect.collidepoint(self.waypoints[self.waypointIndex][1]):
             self.waypointIndex += 1
@@ -314,4 +314,4 @@ class NPC(Character):
     def ko(self):
         self.image = self.ko_image
         self.KO = True
-        self.statesIndex = 5
+        self.setState('ko')
