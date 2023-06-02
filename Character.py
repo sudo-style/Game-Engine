@@ -28,11 +28,17 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.oxygen = 100
         self.KO = False
         self.suitName = name
+        self.pos = pos
+        self.searchPos = pygame.Vector2()
+
+        self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
+        self.statesIndex = 1
         
     def update(self):
         # lets the NPC breathe oxygen if not getting strangled and not KO yet
         self.breathing()
         if self.health <= 0: self.kill()
+        self.pos = self.rect.center
 
     def ko(self):
         self.image = self.ko_image
@@ -48,6 +54,10 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.oxygen += 1
         if self.oxygen > 100: self.oxygen = 100
 
+    def setState(self, state):
+        if state in self.states:
+            self.statesIndex = self.states.index(state)
+
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
@@ -62,6 +72,7 @@ class Player(Character):
         self.inventory.update()
         pygame.display.update()
         self.inputDelay -= 1
+        self.pos = self.rect.center
     
     def shoot(self):
         # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
@@ -210,8 +221,7 @@ class Player(Character):
 class NPC(Character):
     def __init__(self, pos, group, parent, name="guard"):
         super().__init__(pos, group, parent, name)
-        self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
-        self.statesIndex = 1
+        
         self.waypoints = [['patrol', (0, 0)], ['idle', 200], ['patrol', (100, 100)], ['patrol', (200, 200)], ['patrol', (self.parent.width, self.parent.height)], ['idle', 100]]
         self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.waypointIndex = 0
@@ -221,28 +231,46 @@ class NPC(Character):
         self.waypointsController() # controls movements of the NPC
         self.breathing()
         if self.health <= 0: self.kill()
+        self.pos = self.rect.center
 
-    def waypointsController(self):
+    def waypointsController(self): # priority queue
         state = self.getState()
         
-        if state == 'ko': 
-            return 
+        print(state)
+
+        # if knocked out, then can't do anything else
+        if state == 'ko': return 
+        
+        if state == 'alert': 
+            self.alert()
+            return
+
         if state == 'search':
             self.search()  # move towards the position of the sound
             return
+        
         if state == 'combat':
             self.combat()
+            return
+
+        # if no special conditions are met, then this is the default state of the path of the NPC
         state = self.waypoints[self.waypointIndex][0]
         if state == 'patrol': self.patrol()  # move towards the next waypoint
         if state == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
 
+        # goes to the begining of the path
         if self.waypointIndex >= len(self.waypoints):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
 
-    def setState(self, state):
-        if state in self.states:
-            self.statesIndex = self.states.index(state)
+    def setSearchPos(self, pos, radius):
+        # random position within the radius
+        radius = radius / 4 # closer but with small variation
+        self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
+
+    def alert():
+        # be idle for a couple seconds, then go to the position of the alert sound
+        pass    
 
     def combat(self):
         # shoot at the player

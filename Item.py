@@ -14,6 +14,7 @@ class Item(pygame.sprite.Sprite, GameObject):
         self.name = name
         self.pickUpTime = 0
         self.count = count
+        self.pos = pos
     
     def drop(self):
         print(f"dropped {self.name}")
@@ -46,7 +47,7 @@ class Explosive(Item):
         
         self.damage = 100
         self.damageRadius = 100
-        self.soundRadius = 300
+        self.soundRadius = 500
 
         self.fuseTime = 200
         self.boolTriggered = False
@@ -87,10 +88,12 @@ class Explosive(Item):
 
         # check any characters in the sound radius
         # TODO this needs to use the radius of the sound
-        #for npc in self.parent.npcs:
+        for npc in self.parent.npcs:
             # check if the npc is in the radius of sound
-            #if (self.rect.colliderect(npc.rect)):
-                #npc.setState('alert')
+            distance = self.getDistanceTo(npc)
+            if (distance <= self.soundRadius):
+                npc.setState('alert')
+                npc.setSearchPos(self.rect.center, self.soundRadius)
 
         # check any characters in the radius
         # TODO this doesn't work either
