@@ -7,6 +7,7 @@ class Item(pygame.sprite.Sprite, GameObject):
     def __init__(self, pos, group, parent, name, count= 1):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
+        # todo have a default sound, and put the gun in its own class
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
@@ -51,20 +52,20 @@ class Explosive(Item):
         self.boolTriggered = False
         
         # sound
-        self.explode = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
+        self.sound = pygame.mixer.Sound(os.path.join("sounds", "grenade.wav"))
         self.fuse = pygame.mixer.Sound(os.path.join("sounds", "fuse.mp3"))
     
     def drop(self):
         print(f"dropped Explosive {self.name}")
         self.boolTriggered = True
-        self.fuse.play()
+        #self.fuse.play()
 
     def update(self):
         # trigger the explosive if the player is close enough
         self.pickUpTime -= 1
         if self.parent.player.rect.colliderect(self.rect):
             if pygame.mouse.get_pressed()[0] and self.pickUpTime <= 0:
-                self.fuse.play()
+                #self.fuse.play()
                 self.boolTriggered = True
                 self.pickUpTime = 20
             # if p is pressed then pick up
@@ -77,7 +78,7 @@ class Explosive(Item):
                 
     
     def explode(self):
-        self.explode.play()
+        self.sound.play()
 
         # draw the damage and sound radius
         pygame.draw.circle(self.parent.screen, (255,0,0), self.rect.center, self.damageRadius)
@@ -86,10 +87,10 @@ class Explosive(Item):
 
         # check any characters in the sound radius
         # TODO this needs to use the radius of the sound
-        for npc in self.parent.npcs:
+        #for npc in self.parent.npcs:
             # check if the npc is in the radius of sound
-            if (self.rect.colliderect(npc.rect)):
-                npc.setState('alert')
+            #if (self.rect.colliderect(npc.rect)):
+                #npc.setState('alert')
 
         # check any characters in the radius
         # TODO this doesn't work either
@@ -109,8 +110,6 @@ class Explosive(Item):
         # remove the explosive from the map
         self.kill()
         
-    def dropped(self):
+    def drop(self):
         self.boolTriggered = True
         self.fuse.play()
-
-        

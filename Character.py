@@ -64,6 +64,9 @@ class Player(Character):
         self.inputDelay -= 1
     
     def shoot(self):
+        # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
+        currentWeapon = self.parent.items[-1]
+        currentWeapon.sound.play()
         # Get the player's position
         player_pos = self.rect.center
         mouse_pos = pygame.mouse.get_pos()
