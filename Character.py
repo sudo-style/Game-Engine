@@ -65,34 +65,45 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.searchPos = pygame.Vector2(pos[0] + randint(-radius, radius), pos[1] + randint(-radius, radius))
 
 
-    def waypointsController(self): # priority queue
+    def movementController(self): # priority queue
         state = self.getState()
         
         # if knocked out, then can't do anything else
         if state == 'ko': return 
         
+        # if alerted, then go to the alert position
         if state == 'alert': 
             self.alert()
             return
-
+        
+        # search around the alert position
         if state == 'search':
             self.search()  # move towards the position of the sound
             return
         
+        # if in combat, then shoot at the player
         if state == 'combat':
             self.combat()
+            print("COMBAT")
             return
 
         # if no special conditions are met, then this is the default state of the path of the NPC
         state = self.waypoints[self.waypointIndex][0]
         if state == 'patrol': self.patrol()  # move towards the next waypoint
         if state == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
+        if state == 'dir': self.rotate() # rotate to the direction 
 
         # goes to the begining of the path
         if self.waypointIndex >= len(self.waypoints):
             self.waypointIndex = 0
             self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
 
+    def rotate(self):
+        angle = self.waypoints[self.waypointIndex][1]
+        self.angle = angle
+        self.image = pygame.transform.rotate(self.original_image, -self.angle)
+        self.waypointIndex += 1
+    
     def ko(self):
         self.image = self.ko_image
         self.KO = True
@@ -102,7 +113,8 @@ class Character(pygame.sprite.Sprite, GameObject):
         # be idle for a couple seconds, then go to the position of the alert sound
 
         # make a new waypoint for the NPC
-        self.waypoints = [['idle', 200], ['patrol', self.searchPos], ['idle', 200]]
+        print("allerted")
+        self.waypoints = [['idle', 200], ['patrol', self.searchPos], ['idle', 200], ['dir', 45], ['idle', 200], ['dir', 135], ['idle', 200]]
         self.waypointIndex = 0
         self.setState('patrol')
 
@@ -301,7 +313,7 @@ class NPC(Character):
         self.waypointIndex = 0
 
     def update(self):
-        self.waypointsController() # controls movements of the NPC
+        self.movementController() # controls movements of the NPC
         self.breathing()
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
