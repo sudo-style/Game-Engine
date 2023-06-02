@@ -278,15 +278,22 @@ class NPC(Character):
         return self.states[self.statesIndex]
 
     def search(self):
-        self.direction = pygame.math.Vector2(self.searchPos[0] - self.rect.centerx, self.searchPos[1] - self.rect.centery)
+        # try to find the player for a couple seconds, otherwise go back to patrol
+        #self.waypoints = [['idle', 200], ['dir', 225], ['idle', 200],['dir', 315]]
+        #self.waypointIndex = 0
+        self.direction = self.getDirectionTo(self.searchPos)
         if self.direction.length() > 0:
             self.direction.normalize_ip()
         self.rect.center += self.direction * self.speed
 
-        # if the NPC is close to the player then go into combat mode
-        if self.rect.colliderect(self.parent.player.rect):
-            self.setState('combat')
 
+        # if the NPC is close to the player then go into combat mode
+        player = self.parent.player
+        angleNPCtoPlayer = self.getDirectionTo(player)
+        if self.isInLineOfSight(player, angleNPCtoPlayer, 10):
+            print("Lets throw hands")
+            self.setState('combat')
+        
     def patrol(self):
         self.direction = pygame.math.Vector2(self.waypoints[self.waypointIndex][1][0] - self.rect.centerx, self.waypoints[self.waypointIndex][1][1] - self.rect.centery)
         if self.direction.length() > 0:
