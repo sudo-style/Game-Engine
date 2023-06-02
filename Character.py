@@ -116,14 +116,9 @@ class Player(Character):
             # Check the raycast against each NPC object
             for npc in self.parent.npcs:
                 npc_pos = npc.rect.center
-                distance = self.distanceTo(npc)
-
+                distance = self.getDistanceTo(npc)
                 # Calculate the angle between the NPC and the player
-                npcToPlayer_angle = math.atan2(npc_pos[1] - player_pos[1], npc_pos[0] - player_pos[0])
-                angle_difference = abs(playerToMouseAngle - npcToPlayer_angle)
-
-                # if angle is smaller than 10 degrees, then npc is in the line of sight
-                if angle_difference <= math.radians(10):
+                if self.isInLineOfSight(npc, playerToMouseAngle, 10):
                     if distance > furthestDistance: 
                         furthestDistance = distance
                         line_endpoint = npc_pos
@@ -134,16 +129,10 @@ class Player(Character):
         else: # shoots the closest NPC in the line of sight
             for npc in self.parent.npcs:
                 npc_pos = npc.rect.center
-                distance = math.sqrt((player_pos[0] - npc_pos[0])**2 + (player_pos[1] - npc_pos[1])**2)
-
+                distance = self.getDistanceTo(npc)
                 # Check if the NPC is closer than the previous closest NPC
                 if distance < closest_distance:
-                    # Calculate the angle between the NPC and the player
-                    npcToPlayer_angle = math.atan2(npc_pos[1] - player_pos[1], npc_pos[0] - player_pos[0])
-                    angle_difference = abs(playerToMouseAngle - npcToPlayer_angle)
-
-                    # if angle is smaller than 10 degrees, then npc is in the line of sight
-                    if angle_difference <= math.radians(10):
+                    if self.isInLineOfSight(npc, playerToMouseAngle, 10):
                         closest_distance = distance
                         line_endpoint = npc_pos
                         closest_npc = npc            
