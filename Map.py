@@ -34,6 +34,7 @@ class Map:
         self.addCharacter((width/2, height/2), 'clown')
         self.addItem((width/2-200, height/2+ 100), 'gun', 5)
         self.addEnemy((width, height/2), 'guard')
+        self.addEnemy((width/2 + 200, height/2 + 200), 'guard')
     
     def addExplosive(self, pos, name = 'bomb'):
         explosive = Explosive(pos, self.camera_group, self, name)

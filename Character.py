@@ -88,7 +88,7 @@ class Character(pygame.sprite.Sprite, GameObject):
         state = self.getState()
         
         # if knocked out, then can't do anything else
-        if state == 'ko': return 
+        if self.KO: return
         
         # if alerted, then go to the alert position
         if state == 'alert': 
@@ -246,7 +246,7 @@ class Player(Character):
             self.weaponAttack()
  
         if keysPressed[K_t] and self.inputDelay < 0:
-            self.inputDelay = 30
+            self.inputDelay = 30 # don't want them to accidentally spam it
             self.takeDisguise()
             
     def takeDisguise(self):
@@ -274,7 +274,7 @@ class Player(Character):
                     # subdue the npc
                     self.subdue(npc)
         
-        if currentWeapon == 'gun':
+        if currentWeapon == 'gun' and self.inputDelay < 0:
             # if the player has bullets in the gun
             if self.inventory.currentWeaponsCount() > 0:
                 self.shoot()
@@ -314,10 +314,9 @@ class Player(Character):
         self.rect.center = oldCenter
 
         if self.inventory.visible: self.inventory.drawCarousel()
-        pygame.display.update()
 
 class NPC(Character):
-    def __init__(self, pos, group, parent, name="guard"):
+    def __init__(self, pos, group, parent, name = "guard"):
         super().__init__(pos, group, parent, name)
         
     def update(self):
@@ -347,4 +346,8 @@ class NPC(Character):
             self.alert()
 
     def shoot(self):
-        pass
+        # TODO: delay depends on gun
+        self.inputDelay = 30 
+        self.inventory.shoot()
+        
+        
