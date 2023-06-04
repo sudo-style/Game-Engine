@@ -113,12 +113,26 @@ class Explosive(Item):
         self.boolTriggered = True
         self.fuse.play()
 
-class Poison(Item):
-    def __init__(self, pos, group, parent, name = "poison"):
+# player can posion food
+# NPC can move, and eat food
+class Food(Item):
+    def __init__(self, pos, group, parent, name = "food"):
+        super().__init__(pos, group, parent, name)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
-
-        self.effect = 'ko' # ko, lethal, emetic
-        self.method = 'inject' # inject, pill
+        self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
+        self.poisonState = 'none'
     
+    
+    def gettingPoisoned(self, state):
+        self.poisonState = self.poisonStates.index(state)
+    
+    def eat(self, target):
+        # if the food was posioned then the target will be posioned
+        if (self.poisonState != 'none'):
+            target.poisoned(self.poisonState)
+            print(f"{target.name} was poisoned")
+        else: 
+            print("MMM, that was good")
+        self.kill()

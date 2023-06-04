@@ -52,7 +52,7 @@ class Player(Character):
     def shoot(self):
         # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
         currentWeapon = self.inventory.currentWeapon()
-        currentWeapon.sound.play()
+        #currentWeapon.sound.play()
         # Get the player's position
         player_pos = self.rect.center
         mouse_pos = pygame.mouse.get_pos()
@@ -197,8 +197,7 @@ class NPC(Character):
         self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
         self.oxygen = 100
         self.KO = False
-
-
+        
     def breathing(self):
         self.oxygen = min(self.oxygen + 1, 100)
 
@@ -250,6 +249,11 @@ class NPC(Character):
             self.alert()
             print("ALERT")
             return
+        
+        if state == 'eat':
+            #self.eat()
+            print("EAT")
+            return
 
         # if no special conditions are met, then this is the default state of the path of the NPC
         waypointState, waypointValue = self.getWaypoint()
@@ -274,6 +278,19 @@ class NPC(Character):
         self.image = self.ko_image
         self.KO = True
         self.setState('ko')
+
+    def eat(self):
+        # find the closest food
+        closestFood = None
+        closestDistance = 30
+        for food in self.parent.foods:
+            distance = self.getDistanceTo(food)
+            if distance < closestDistance:
+                closestDistance = distance
+                closestFood = food
+        
+        # eat the food
+        if closestFood != None: closestFood.eat(self)
 
     def alert(self):
         # be idle for a couple seconds, then go to the position of the alert sound
@@ -321,6 +338,13 @@ class NPC(Character):
 class Guard(NPC):
     def __init__(self, pos, group, parent, name = "guard"):
         super().__init__(pos, group, parent, name)
+
+        self.waypoints = [['patrol', (0, 0)], 
+                          ['patrol', (100, 100)], 
+                          ['patrol', (200, 200)], 
+                          ['idle', 200],
+                          ['patrol', (30,30)]]
+        self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
 
     def combat(self):
         # try to follow the player and shoot at them
