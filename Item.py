@@ -87,7 +87,6 @@ class Explosive(Item):
         pygame.display.update()
 
         # check any characters in the sound radius
-        # TODO this needs to use the radius of the sound
         for npc in self.parent.npcs:
             # check if the npc is in the radius of sound
             distance = self.getDistanceTo(npc)
@@ -95,12 +94,9 @@ class Explosive(Item):
                 npc.setState('alert')
                 npc.setSearchPos(self.rect.center, self.soundRadius)
 
-        # check any characters in the radius
-        # TODO this doesn't work either
-        for npc in self.parent.npcs:
-            if (self.rect.colliderect(npc.rect)):
+            if (distance <= self.damageRadius):
                 npc.health -= self.damage
-        
+
         # explode explosives in the radius
         for explosive in self.parent.items:
             # check if the class is an explosive
@@ -116,3 +112,13 @@ class Explosive(Item):
     def drop(self):
         self.boolTriggered = True
         self.fuse.play()
+
+class Poison(Item):
+    def __init__(self, pos, group, parent, name = "poison"):
+        self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
+        self.rect = self.image.get_rect(center = pos)
+        self.parent = parent
+
+        self.effect = 'ko' # ko, lethal, emetic
+        self.method = 'inject' # inject, pill
+    
