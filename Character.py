@@ -30,7 +30,6 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.health = 100
         self.maxHealth = 100
 
-
         self.suitName = name
         self.pos = pos
 
@@ -140,6 +139,7 @@ class Player(Character):
                 if self.rect.colliderect(npc.rect):
                     # subdue the npc
                     self.subdue(npc)
+                    return
         
         if currentWeapon == 'gun' and self.inputDelay < 0:
             # if the player has bullets in the gun
