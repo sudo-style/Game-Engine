@@ -3,6 +3,7 @@ from pygame.locals import *
 import os
 from Inventory import Inventory
 from GameObject import GameObject
+#from Blood import Blood
 import math 
 import copy
 from random import randint
@@ -15,6 +16,7 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
         self.ko_image = pygame.image.load(os.path.join('sprites','character', name, 'ko.png')).convert_alpha()
         self.naked_image = pygame.image.load(os.path.join('sprites','character', name, 'naked.png')).convert_alpha()
+        #self.blood_texture = pygame.image.load(os.path.join('sprites','character', 'blood.png')).convert_alpha()
         self.searchPos = pygame.Vector2()
         self.waypoints = [['patrol', (0, 0)], 
                           ['patrol', (100, 100)], 
@@ -33,6 +35,8 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.group = group
         self.parent = parent
         self.health = 100
+        self.maxHealth = 100
+
         self.oxygen = 100
         self.KO = False
         self.suitName = name
@@ -43,20 +47,17 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.statesIndex = 1
         
     def update(self):
-        # lets the NPC breathe oxygen if not getting strangled and not KO yet
         self.breathing()
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
 
     def breathing(self):
-        self.oxygen += 1
-        self.oxygen = min(self.oxygen, 100)
+        self.oxygen = min(self.oxygen + 1, 100)
 
     def gettingSubdued(self):
         # oxygen decreases when getting strangled
         self.oxygen -= 2
-        if self.oxygen <= 0: 
-            self.ko()
+        if self.oxygen <= 0: self.ko()
 
     def getState(self):
         return self.states[self.statesIndex]
@@ -103,6 +104,8 @@ class Character(pygame.sprite.Sprite, GameObject):
             return
 
         # if no special conditions are met, then this is the default state of the path of the NPC
+        waypointState, waypointValue = self.getWaypoint()
+        
         waypointState = self.getWaypoint()[0]
         #print("waypointState: " + waypointState)
         if waypointState == 'patrol': self.patrol()  # move towards the next waypoint
@@ -144,14 +147,15 @@ class Character(pygame.sprite.Sprite, GameObject):
         if self.waypoints[-1][1] <= 0: self.nextWaypoint()
         
     def patrol(self):
-        pos = GameObject(self.waypoints[-1][1])
+        waypointState, waypointValue = self.getWaypoint()
+        
+        pos = GameObject(waypointValue)
         if self.getDistanceTo(pos) < self.speed: 
             print("NEXT WAYPOINT")
             self.nextWaypoint()
             return
 
-        moveHere = self.waypoints[-1][1]
-        self.direction = pygame.math.Vector2(moveHere[0] - self.rect.centerx, moveHere[1] - self.rect.centery)
+        self.direction = pygame.math.Vector2(waypointValue[0] - self.rect.centerx, waypointValue[1] - self.rect.centery)
         if self.direction.length() > 0:
             self.direction.normalize_ip()
         self.rect.center += self.direction * self.speed
@@ -180,12 +184,12 @@ class Player(Character):
         self.rect.center += self.direction * self.speed
         self.inventory.update()
         pygame.display.update()
-        self.inputDelay -= 1
+        self.inputDelay = max(self.inputDelay - 1, 0)
         self.pos = self.rect.center
     
     def shoot(self):
         # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
-        currentWeapon = self.parent.items[-1]
+        currentWeapon = self.inventory.currentWeapon()
         currentWeapon.sound.play()
         # Get the player's position
         player_pos = self.rect.center
@@ -346,8 +350,6 @@ class NPC(Character):
             self.alert()
 
     def shoot(self):
-        # TODO: delay depends on gun
-        self.inputDelay = 30 
-        self.inventory.shoot()
+        pass
         
         

@@ -29,6 +29,7 @@ def main():
         camera_group.update()
         camera_group.custom_draw(mission.player) # this will focus on the player
         mission.clock.tick(mission.fps)
+        
 
 if __name__ == "__main__":
     main()
