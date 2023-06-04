@@ -5,7 +5,7 @@ import math
 from random import randint
 
 from Item import Item, Explosive
-from Character import Character, Player, NPC
+from Character import Character, Player, NPC, Guard
 from GameObject import GameObject
 
 class Map:
@@ -45,9 +45,9 @@ class Map:
         self.items.append(item)
 
     def addCharacter(self, pos, name):
-        character = Character(pos, self.camera_group, self, name)
+        character = NPC(pos, self.camera_group, self, name)
         self.npcs.append(character)
 
     def addEnemy(self, pos, name):
-        character = NPC(pos, self.camera_group, self, name)
+        character = Guard(pos, self.camera_group, self, name)
         self.npcs.append(character)
