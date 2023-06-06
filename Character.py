@@ -46,6 +46,14 @@ class Character(pygame.sprite.Sprite, GameObject):
                 self.blood_texture = pygame.image.load(os.path.join('sprites', 'character', 'blood', blood_texture_name)).convert_alpha()
                 break
 
+    def draw(self):
+        # takes the original image, adds the blood texture, and rotates it
+        transformed_image = pygame.Surface(self.original_image.get_size(), pygame.SRCALPHA)
+        transformed_image.blit(self.original_image, (0, 0))
+        transformed_image.blit(self.blood_texture, (0, 0))
+        rotated_image = pygame.transform.rotate(transformed_image, -self.angle)
+        self.image = rotated_image
+        self.rect = self.image.get_rect(center=self.rect.center)
 
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
@@ -56,7 +64,6 @@ class Player(Character):
 
     def update(self):
         self.input()
-        self.updateHealth()
         self.draw()
         self.rect.center += self.direction * self.speed
         self.inventory.update()
@@ -99,7 +106,8 @@ class Player(Character):
                     if distance > furthestDistance: 
                         furthestDistance = distance
                         line_endpoint = npc_pos
-                    npc.ko()
+                    npc.health -= 25
+                    npc.updateHealth()
             pygame.draw.line(self.parent.screen, white, player_pos, line_endpoint, 2)
             return
         
@@ -113,7 +121,10 @@ class Player(Character):
                         closest_distance = distance
                         line_endpoint = npc_pos
                         closest_npc = npc            
-            if closest_npc != None: closest_npc.ko()
+            if closest_npc != None: 
+                closest_npc.health -= 25
+                closest_npc.updateHealth()
+                #closest_npc.ko()
             pygame.draw.line(self.parent.screen, white, player_pos, line_endpoint, 2)
         
     def input(self):
@@ -231,9 +242,10 @@ class NPC(Character):
     def update(self):
         self.movementController() # controls movements of the NPC
         self.breathing()
-        self.updateHealth()
+        self.draw()
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
+        
 
     def getState(self):
         return self.states[self.statesIndex]
