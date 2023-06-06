@@ -16,7 +16,7 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
         self.ko_image = pygame.image.load(os.path.join('sprites','character', name, 'ko.png')).convert_alpha()
         self.naked_image = pygame.image.load(os.path.join('sprites','character', name, 'naked.png')).convert_alpha()
-        self.blood_texture = pygame.image.load(os.path.join('sprites','character', 'blood.png')).convert_alpha()
+        self.blood_texture = pygame.image.load(os.path.join('sprites','character', 'blood', 'blood0.png')).convert_alpha()
         
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect(center = pos)
@@ -33,6 +33,20 @@ class Character(pygame.sprite.Sprite, GameObject):
         self.suitName = name
         self.pos = pos
 
+    def updateHealth(self):
+        blood_textures = {
+            range(0, 25): 'blood3.png',
+            range(26, 51): 'blood2.png',
+            range(51, 76): 'blood1.png',
+            range(76, 100): 'blood0.png'
+        }
+
+        for health_range, blood_texture_name in blood_textures.items():
+            if self.health in health_range:
+                self.blood_texture = pygame.image.load(os.path.join('sprites', 'character', 'blood', blood_texture_name)).convert_alpha()
+                break
+
+
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
@@ -42,6 +56,7 @@ class Player(Character):
 
     def update(self):
         self.input()
+        self.updateHealth()
         self.draw()
         self.rect.center += self.direction * self.speed
         self.inventory.update()
@@ -173,12 +188,19 @@ class Player(Character):
         self.angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
     
     def draw(self):
-        # rotate the image
-        oldCenter = self.rect.center
-        self.oldCenter = oldCenter
-        self.image = pygame.transform.rotate(self.original_image, -self.angle)
-        self.rect = self.image.get_rect()
-        self.rect.center = oldCenter
+        # Create a new surface for the transformed image
+        transformed_image = pygame.Surface(self.original_image.get_size(), pygame.SRCALPHA)
+
+        # Add the blood splatter to the original image
+        transformed_image.blit(self.original_image, (0, 0))
+        transformed_image.blit(self.blood_texture, (0, 0))
+
+        # Rotate the transformed image
+        rotated_image = pygame.transform.rotate(transformed_image, -self.angle)
+        self.image = rotated_image
+
+        # Update the rectangle based on the transformed image
+        self.rect = self.image.get_rect(center=self.rect.center)
 
         if self.inventory.visible: self.inventory.drawCarousel()
 
@@ -209,6 +231,7 @@ class NPC(Character):
     def update(self):
         self.movementController() # controls movements of the NPC
         self.breathing()
+        self.updateHealth()
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
 
