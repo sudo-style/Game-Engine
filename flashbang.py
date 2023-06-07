@@ -12,12 +12,13 @@ class Flashbang:
         self.height = height
         self.screen = screen
 
-    def trigger(self, stunTime=300):
+    def trigger(self, stunTime=500):
         self.on = True
         self.timer = stunTime
 
         # Get a freeze frame of the current screen
-        self.freezeFrame = pygame.Surface((self.width, self.height))
+        #self.freezeFrame = pygame.image.save(self.screen, "freezeFrame.png")
+        self.freezeFrame = pygame.image.load("freezeFrame.png")
 
     def update(self):
         # Once the flashbang is triggered, it will stay on for the specified time
@@ -34,12 +35,25 @@ class Flashbang:
         elif 20 <= x <= 100: return 1
         elif 100 <= x <= 400: return 1 - 0.005 * (x - 100)
         else: return 0
-
+    
+    def afterimageBrightnessFunction(self, x):
+        if x < 100: return 0
+        elif 100 <= x < 200: return (x - 100) / 100 * 0.33
+        elif 200 <= x < 300: return 0.33
+        elif 300 <= x <= 400: return 0.33 - (x - 300) / 100 * 0.33
+        else: return 0
+        
     def draw(self):
         if self.on:
-            brightness = self.brightnessFunction(self.timer/60)
-            color = (int(brightness * 255), int(brightness * 255), int(brightness * 255))
+            brightness = self.brightnessFunction(self.timer/60) * 255
+            color = (int(brightness), int(brightness), int(brightness))
             pygame.draw.rect(self.screen, color, self.screen.get_rect())
+            
+            # draw the flashbang freeze frame with an alpha value
+
+            brightnessFreezeFrame = self.afterimageBrightnessFunction(self.timer) * 255
+            self.freezeFrame.set_alpha(brightnessFreezeFrame)
+            self.screen.blit(self.freezeFrame, (0, 0))
 
 def main():
     pygame.init()
