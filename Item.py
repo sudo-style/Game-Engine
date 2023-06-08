@@ -122,17 +122,18 @@ class Food(Item):
         self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
-        self.poisonState = 'none'
-    
+        self.poisonState = 0
     
     def gettingPoisoned(self, state):
         self.poisonState = self.poisonStates.index(state)
     
     def eat(self, target):
         # if the food was posioned then the target will be posioned
-        if (self.poisonState != 'none'):
-            target.poisoned(self.poisonState)
-            print(f"{target.name} was poisoned")
-        else: 
+        if (self.poisonStates[self.poisonState] == 'none'):
             print("MMM, that was good")
+            self.kill()
+            return
+        target.poisoned(self.poisonState)
+        print(f"{target.name} was poisoned")
         self.kill()
+        

@@ -5,7 +5,8 @@ import math
 from random import randint
 
 from Item import Item, Explosive, Food
-from Character import Character, Player, NPC, Guard
+from Character import Character, Player
+from NPC import NPC, Guard
 from GameObject import GameObject
 
 
