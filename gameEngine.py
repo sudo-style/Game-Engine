@@ -6,6 +6,7 @@ from Map import Map
 from CameraGroup import CameraGroup
 from GameObject import GameObject
 
+
 def main():
     pygame.init()
     width = 1920

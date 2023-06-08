@@ -8,7 +8,7 @@ class NPC(Character):
     def __init__(self, pos, group, parent, name = "clown"):
         super().__init__(pos, group, parent, name)
 
-        self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
+        self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko', 'emetic', 'lethal']
         self.statesIndex = 1
         self.searchPos = pygame.Vector2()
         self.waypoints = [['eat', 0],
@@ -35,8 +35,7 @@ class NPC(Character):
         self.draw()
         if self.health <= 0: self.kill()
         self.pos = self.rect.center
-        
-
+    
     def getState(self):
         return self.states[self.statesIndex]
 
@@ -73,12 +72,7 @@ class NPC(Character):
         if state == 'alert': 
             self.alert()
             print("ALERT")
-            return
-        
-        #if state == 'eat':
-            #print("EAT")
-            #self.eat()
-        #    return
+            return    
 
         # if no special conditions are met, then this is the default state of the path of the NPC
         waypointState, waypointValue = self.getWaypoint()
@@ -116,7 +110,7 @@ class NPC(Character):
                 closestDistance = distance
                 closestFood = food
 
-        # eat the food
+        # will only eat 1 food or nothing
         if closestFood != None: closestFood.eat(self)
         self.nextWaypoint()
 

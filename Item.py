@@ -133,7 +133,20 @@ class Food(Item):
             print("MMM, that was good")
             self.kill()
             return
-        target.poisoned(self.poisonState)
         print(f"{target.name} was poisoned")
+        target.setState(self.poisonStates[self.poisonState])
         self.kill()
         
+class Poison(Item):
+    def __init__(self, pos, group, parent, name = "ko"):
+        super().__init__(pos, group, parent, name)
+        self.rect = self.image.get_rect(center = pos)
+        self.parent = parent
+        self.posionType = ['injection', 'pill']
+        self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
+        self.poisonState = 0
+    
+    def poison(self, target):
+        print(f"{target.name} was poisoned")
+        target.poisoned(self.poisonState)
+        self.kill()
