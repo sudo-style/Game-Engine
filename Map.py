@@ -8,6 +8,7 @@ from Item import Item, Explosive, Food
 from Character import Character, Player, NPC, Guard
 from GameObject import GameObject
 
+
 class Map:
     def __init__(self, name, width, height, screen, clock, fps, camera_group):
         self.name = name

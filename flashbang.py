@@ -19,6 +19,8 @@ class Flashbang:
         self.on = True
         self.timer = stunTime
         self.stunTime = stunTime
+        pygame.image.save(self.screen, "freezeFrame.png")
+        self.freezeFrame = pygame.image.load("freezeFrame.png")
         print("triggered")
 
     def update(self):
