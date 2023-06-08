@@ -11,7 +11,8 @@ class NPC(Character):
         self.states = ['idle', 'patrol', 'alert', 'search', 'combat', 'ko']
         self.statesIndex = 1
         self.searchPos = pygame.Vector2()
-        self.waypoints = [['patrol', (0, 0)], 
+        self.waypoints = [['eat', 0],
+                          ['patrol', (200, 500)], 
                           ['patrol', (100, 100)], 
                           ['patrol', (200, 200)], 
                           ['idle', 200],
@@ -74,10 +75,10 @@ class NPC(Character):
             print("ALERT")
             return
         
-        if state == 'eat':
+        #if state == 'eat':
+            #print("EAT")
             #self.eat()
-            print("EAT")
-            return
+        #    return
 
         # if no special conditions are met, then this is the default state of the path of the NPC
         waypointState, waypointValue = self.getWaypoint()
@@ -88,6 +89,7 @@ class NPC(Character):
         if waypointState == 'search': self.search() # rotate to the direction 
         if waypointState == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
         if waypointState == 'dir': self.rotate() # rotate to the direction 
+        if waypointState == 'eat': self.eat() # rotate to the direction
         
         # goes to the begining of the path
         if self.lenWaypoints() == 0: self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
@@ -105,6 +107,7 @@ class NPC(Character):
 
     def eat(self):
         # find the closest food
+        print("EATING")
         closestFood = None
         closestDistance = 30
         for food in self.parent.foods:
@@ -115,6 +118,7 @@ class NPC(Character):
 
         # eat the food
         if closestFood != None: closestFood.eat(self)
+        self.nextWaypoint()
 
     def alert(self):
         # be idle for a couple seconds, then go to the position of the alert sound
