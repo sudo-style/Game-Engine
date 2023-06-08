@@ -64,6 +64,8 @@ class NPC(Character):
     
     def movementController(self): # priority queue
         state = self.getState()
+
+        print(self.KO)
         
         # if knocked out, then can't do anything else
         if self.KO: return

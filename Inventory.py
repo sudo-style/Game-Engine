@@ -6,6 +6,7 @@ import math
 explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
 guns = ['smg', 'pistol', 'sniper', 'gun']
 keep = ['fiberWire']
+poisons = ['ko', 'lethal', 'emetic']
 
 class Inventory:
     def __init__(self, grandparent):
@@ -113,6 +114,9 @@ class Inventory:
                     self.grandparent.player.shoot()
                 self.interactDelay = 20 # should determined by the gun
                 return 
+            
+            elif currentWeapon in poisons:
+                self.grandparent.addPoison((self.grandparent.player.rect.center), currentWeapon)
             
             elif currentWeapon in explosives: 
                 self.grandparent.addExplosive((self.grandparent.player.rect.center), currentWeapon)

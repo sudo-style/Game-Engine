@@ -29,12 +29,12 @@ class Item(pygame.sprite.Sprite, GameObject):
         self.pickUpTime -= 1
         if self.parent.player.rect.colliderect(self.rect):       
             # if e is pressed then pick up
-            if pygame.key.get_pressed()[K_p] and self.pickUpTime <= 0:
+            if pygame.key.get_pressed()[K_f] and self.pickUpTime <= 0:
                 self.pickUpTime = 20
                 self.pickUp()
 
     def tryPickUp(self):
-        if pygame.key.get_pressed()[K_p] and self.pickUpTime <= 0:
+        if pygame.key.get_pressed()[K_f] and self.pickUpTime <= 0:
                 self.pickUpTime = 20
                 self.pickUp()
                 
@@ -123,8 +123,12 @@ class Food(Item):
         self.parent = parent
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
+
+    def getPosionState(self):
+        return self.poisonStates[self.poisonState]
     
     def gettingPoisoned(self, state):
+        print('food is poisioned')
         self.poisonState = self.poisonStates.index(state)
     
     def eat(self, target):
@@ -136,6 +140,24 @@ class Food(Item):
         print(f"{target.name} was poisoned")
         target.setState(self.poisonStates[self.poisonState])
         self.kill()
+
+        if self.getPosionState()== 'ko':
+            target.ko()
+
+
+    def update(self):
+        self.pickUpTime -= 1
+        
+        player = self.parent.player
+        if self.parent.player.rect.colliderect(self.rect):       
+            # if e is pressed, then poison the food
+            if player.inventory.currentWeapon() == 'ko' and pygame.key.get_pressed()[K_e] and self.pickUpTime <= 0:
+                self.pickUpTime = 20
+                self.gettingPoisoned('ko')
+            
+            elif pygame.key.get_pressed()[K_e] and self.pickUpTime <= 0:
+                self.pickUpTime = 20
+                self.pickUp()
         
 class Poison(Item):
     def __init__(self, pos, group, parent, name = "ko"):
