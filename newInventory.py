@@ -125,7 +125,6 @@ class Inventory:
             self.selectRight()
             self.interactDelay = 10
 
-
         # e to interact
         if keysPressed[K_e] and self.interactDelay <= 0:
             # guns

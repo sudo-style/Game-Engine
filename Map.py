@@ -4,7 +4,7 @@ import os
 import math
 from random import randint
 
-from Item import Item, Explosive, Food, Poison
+from Item import Item, Explosive, Food, Poison, Gun
 from Character import Character
 from Player import Player
 from NPC import NPC, Guard
@@ -32,11 +32,9 @@ class Map:
         # add player to the map
         self.player = Player((width/2, height/2), self.camera_group, self, 'player')
 
-       
-        
         # adding an npc to the map
         self.addExplosive((width/2, height/2))
-        self.addItem((width/2-200, height/2+ 100), 'gun', 5)
+        self.addGun((width/2-200, height/2+ 100), 'gun', 5, 20)
        
         # add poison to the map
         self.addPoison((300, 600), 'ko')
@@ -70,5 +68,6 @@ class Map:
         poison = Poison(pos, self.camera_group, self, name)
         self.items.append(poison)
 
-
-    
+    def addGun(self, pos, name, count, fireRate):
+        gun = Gun(pos, self.camera_group, self, name, count, fireRate)
+        self.items.append(gun)

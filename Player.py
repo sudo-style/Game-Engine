@@ -32,8 +32,13 @@ class Player(Character):
     
     def shoot(self):
         # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
-        currentWeapon = self.inventory.currentWeapon()
-        #currentWeapon.sound.play()
+        print("shooting")
+
+        self.inventory.shoot()
+        self.inputDelay = 30
+        
+        currentWeapon = self.inventory.currentItem()
+        currentWeapon.sound.play()
         # Get the player's position
         player_pos = self.rect.center
         mouse_pos = pygame.mouse.get_pos()
@@ -54,7 +59,7 @@ class Player(Character):
         closest_distance = float('inf')
 
         # will shoot all of the NPCs in the line of sight
-        if self.inventory.currentWeapon() == 'sniper':
+        if currentWeapon == 'sniper':
             furthestDistance = 0
             # Check the raycast against each NPC object
             for npc in self.parent.npcs:
@@ -115,10 +120,10 @@ class Player(Character):
                     npc.original_image = pygame.image.load(os.path.join('sprites', 'character', npc.suitName, npc.suitName + '.png')).convert_alpha()
                     
     def weaponAttack(self):
-        currentWeapon = self.inventory.currentWeapon()
+        currentItem = self.inventory.currentItem()
 
         # subdue if NPC is close enough
-        if currentWeapon == 'fiberWire':
+        if currentItem.name == 'fiberWire':
             # check if npc is close to players
             for npc in self.parent.npcs:                
                 if self.rect.colliderect(npc.rect):
@@ -126,10 +131,11 @@ class Player(Character):
                     self.subdue(npc)
                     return
         
-        if currentWeapon == 'gun' and self.inputDelay < 0:
+        if self.inventory.isCurrentItemGun() and currentItem.count > 0 and self.inputDelay <= 0:
             # if the player has bullets in the gun
-            if self.inventory.currentWeaponsCount() > 0:
-                self.shoot()
+            self.shoot()
+            
+            
 
     def subdue(self, npc):
         # drag the npc to the player

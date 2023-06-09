@@ -3,141 +3,157 @@ from pygame.locals import *
 import os
 import math
 
-explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
-guns = ['smg', 'pistol', 'sniper', 'gun']
-keep = ['fiberWire']
-poisons = ['ko', 'lethal', 'emetic']
+
+from Item import Item, Poison, Explosive
+from CameraGroup import CameraGroup
+
+
 
 class Inventory:
     def __init__(self, grandparent):
         self.grandparent = grandparent
-        self.maxInventory = {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':6}  
-        self.inventory = {}
-        self.updated = []
-        self.addItem('fiberWire')
-        self.addItem('tnt')
-        self.addItem('gun',5)
+        self.inventory = []
+        item = Item((0,0), grandparent.camera_group, grandparent, 'fiberWire')
+        self.addItem(item)
         self.visible = True
         self.interactDelay = 0
 
-    def addItem(self, item, count = 1):
-        print("adding item " + item)
-        if item not in self.inventory:
-            self.inventory[item] = count
-            self.updated = [item] + self.updated
-            return
-        self.updated.remove(item)
-        self.updated = [item] + self.updated
-        self.inventory[item] += count
-        if item in self.maxInventory:
-            self.inventory[item] = min(self.inventory[item],self.maxInventory[item])
-
-    def currentWeaponsCount(self):
-        return self.inventory[self.currentWeapon()]
+    def maxInventory(self):
+        return {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':20}  
     
-    def currentWeapon(self):
-        return self.updated[0]
-
-    def removeItem(self):
-        if len(self.updated) <= 0: return
+    def isCurrentItemGun(self):
+        gun = self.currentItem().name
+        guns = ['smg', 'pistol', 'sniper', 'gun']
+        return gun in guns
     
-        item = self.currentWeapon()
-        print("removing: " + item)
+    def isCurrentItemPoison(self):
+        poison = self.currentItem().name
+        poisons = ['ko', 'lethal', 'emetic']
+        return poison in poisons
+    
+    def isCurrentItemExplosive(self):
+        explosive = self.currentItem().name
+        explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
+        return explosive in explosives
+    
+    def isCurrentItemKeep(self):
+        keep = self.currentItem().name
+        keeps = ['fiberWire', 'camera']
+        return keep in keeps
 
-        isGun = item in self.maxInventory
-        willRemoveAll = self.inventory[item] <= 1
-        if isGun or willRemoveAll:
-            self.inventory.pop(item)
-            self.updated.remove(item)
-            return
-        self.inventory[item]-=1 
+    def addItem(self, Item):
+        desiredName = Item.name
+     
+        # remove the item from the inventory array
+        for item in self.inventory:
+            if item.name == desiredName:
+                Item.count += item.count
+                self.inventory.remove(item)
+                print('removed item')
+        
+        # this is done so items are added to the front of the array
+        self.inventory = [Item] + self.inventory
+        self.limitInventoryToMax(desiredName)
+
+    def limitInventoryToMax(self, name):
+        if name not in self.maxInventory(): return
+        for item in self.inventory:
+            if item.name == name:
+                item.count = min(item.count, self.maxInventory()[name])
+
+    def currentItemCount(self):
+        return self.inventory[0].count
+    
+    def currentItem(self):
+        return self.inventory[0]
+
+    def removeCurrentItem(self):
+        self.inventory[0].count -= 1
+        if self.inventory[0].count <= 0:
+            self.inventory.pop(0)
 
     def shoot(self):
-        gun = self.currentWeapon()
-        print("trying to shoot " + gun)
-        if not gun in self.maxInventory:
-            print("not a gun")
-            return
-        print("was a gun")
-        if self.inventory[gun] > 0:        
-            self.inventory[gun] -= 1
+        # if not a gun don't shoot
+        if not self.isCurrentItemGun(): return
+        gun = self.currentItem()
+        # if no ammo don't shoot
+        if gun.count <= 0: return
+        gun.count -= 1
 
     def print(self):
-        print(f"inventory: {self.inventory}")
-        print(f"updated: {self.updated}\n")
+        for item in self.inventory:
+            print(f"{item.name} {item.count}")
 
     def selectLeft(self):
-        self.updated = [self.updated[-1]] + self.updated[0:-1]
+        self.inventory = [self.inventory[-1]] + self.inventory[0:-1]
         
     def selectRight(self):
-        self.updated = self.updated[1:] + self.updated[:1]
+        self.inventory = self.inventory[1:] + self.inventory[:1]
 
     def drawAmmo(self):
-        if self.currentWeapon() in guns:
-            ammo = self.currentWeaponsCount()                                               # gets the amount of ammo
-            font = pygame.font.SysFont('arial', 30)                                                     # creates a font
-            text = font.render(f"Ammo: {ammo}", True, (255, 255, 255))                                  # creates the text
-            self.grandparent.screen.blit(text, (self.grandparent.width - text.get_width() - 10, 10))    # Blit the text onto the main screen
+        if not self.isCurrentItemGun(): return
+        gun = self.currentItem()
+        font = pygame.font.SysFont(None, 30)
+        ammo = font.render(str(gun.count), True, (255,255,255))
+        self.grandparent.screen.blit(ammo, (0,0))
 
     def update(self):
-        # a short delay between interactions
-        self.interactDelay -= 1
-        currentWeapon = self.currentWeapon()
-        
-        # if v is pressed, toggle visibility
+        self.interactDelay = max(0, self.interactDelay - 1)
+        currentItem = self.currentItem()
         keysPressed = pygame.key.get_pressed()
-        if keysPressed[K_v] and self.interactDelay <= 0:
+
+        self.drawAmmo()
+
+        # v toggles visibility
+        if keysPressed[K_v] and self.interactDelay == 0:
             self.visible = not self.visible
-            self.interactDelay = 30
+            self.interactDelay = 10
 
-        self.drawAmmo() # only draws when gun is selected
-
-        # everything below needs the inventory to be visible
         if not self.visible: return
-        self.drawCarousel()
 
-        # rotate the carousel for directional keys
-        if keysPressed[K_LEFT] and self.interactDelay <= 0:
+        # left and right arrows to switch items
+        if keysPressed[K_LEFT] and self.interactDelay == 0:
             self.selectLeft()
-            self.interactDelay = 20
-
-        if keysPressed[K_RIGHT] and self.interactDelay <= 0:
+            self.interactDelay = 10
+        if keysPressed[K_RIGHT] and self.interactDelay == 0:
             self.selectRight()
-            self.interactDelay = 20            
+            self.interactDelay = 10
 
-        # if e is pressed drop item:
-        if keysPressed[K_e] and currentWeapon not in keep and self.interactDelay <= 0:
-            if currentWeapon in guns: 
-                # if can shoot, then shoot
-                if self.inventory[currentWeapon] > 0:
-                    self.shoot()
-                    self.grandparent.player.shoot()
-                self.interactDelay = 20 # should determined by the gun
-                return 
-            
-            elif currentWeapon in poisons:
-                self.grandparent.addPoison((self.grandparent.player.rect.center), currentWeapon)
-            
-            elif currentWeapon in explosives: 
-                self.grandparent.addExplosive((self.grandparent.player.rect.center), currentWeapon)
-                self.grandparent.items[-1].drop()
-            else: 
-                self.grandparent.addItem((self.grandparent.player.rect.center), currentWeapon)
-                self.grandparent.items[-1].drop()
-            print(self.grandparent.items)
-            
-            self.removeItem() # make sure to spawn the item in the map
-            self.interactDelay = 20
-            print(self.updated)
+        # e to interact
+        if keysPressed[K_e] and self.interactDelay <= 0:
+            # guns
+            if self.isCurrentItemGun():
+                self.shoot()
+                self.interactDelay = currentItem.fireRate
+                return
+            # poisons
+            # drop the poison, if it collides with a person, or food apply the poison
+            # otherwise just drop it on the ground
+            if self.isCurrentItemPoison():
+                self.grandparent.addPoison(currentItem)
+                self.removeCurrentItem()
+                self.interactDelay = 10
+                return
+            # explosives
+            if self.isCurrentItemExplosive():
+                self.grandparent.addExplosive(currentItem)
+                self.removeCurrentItem()
+                self.interactDelay = 10
+                return
+            # keeps
+            if self.isCurrentItemKeep():
+                currentItem.interact() # this will be the default behavior of all items?
+                self.interactDelay = 10
+                return
+            self.removeCurrentItem()
+            self.print()
+            self.interactDelay = 10
 
     def drawCarousel(self):
-        # draw a square at the bottom of the screen
         pygame.draw.rect(self.grandparent.screen, (255,255,255), (0, self.grandparent.height - 100, self.grandparent.width, 100))
-        
-        # draw the items
-        for i in range(len(self.updated)):
-            item = self.updated[i]
-            self.grandparent.screen.blit(pygame.image.load(os.path.join("sprites", 'items', item + ".png")), (i*100, self.grandparent.height - 75))
+        for i in range(len(self.inventory)):
+            item = self.inventory[i]
+            self.grandparent.screen.blit(pygame.image.load(os.path.join('sprites','items', item.name + '.png')), (i*100, self.grandparent.height - 75))
 
 
 
