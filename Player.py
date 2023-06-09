@@ -6,6 +6,9 @@ from GameObject import GameObject
 from Character import Character
 from Inventory import Inventory
 
+from Item import Item, Poison, Explosive, Gun, Food
+
+
 #from Blood import Blood
 import math 
 import copy
@@ -31,21 +34,20 @@ class Player(Character):
         self.pos = self.rect.center
     
     def shoot(self):
-        # todo find a better way to get the current weapon, maybe use a dictionary with string keys and values as the items themselves
-        print("shooting")
+        gun = self.inventory.currentItem()
+        print(gun.count)
+        if gun.count <= 0: return
 
         self.inventory.shoot()
         self.inputDelay = 30
-        
-        currentWeapon = self.inventory.currentItem()
-        currentWeapon.sound.play()
+        gun.sound.play()        
         # Get the player's position
         player_pos = self.rect.center
         mouse_pos = pygame.mouse.get_pos()
 
         # Calculate the ray direction
-        delta_x = mouse_pos[0] - player_pos[0] + self.group.offset.x
-        delta_y = mouse_pos[1] - player_pos[1] + self.group.offset.y
+        delta_x = mouse_pos[0] - player_pos[0] 
+        delta_y = mouse_pos[1] - player_pos[1] 
         playerToMouseAngle = math.atan2(delta_y, delta_x)
 
         # Calculate a long line endpoint based on the ray direction
@@ -59,7 +61,7 @@ class Player(Character):
         closest_distance = float('inf')
 
         # will shoot all of the NPCs in the line of sight
-        if currentWeapon == 'sniper':
+        if gun == 'sniper':
             furthestDistance = 0
             # Check the raycast against each NPC object
             for npc in self.parent.npcs:
@@ -104,6 +106,11 @@ class Player(Character):
         if keysPressed[K_t] and self.inputDelay <= 0:
             self.inputDelay = 30 # don't want them to accidentally spam it
             self.takeDisguise()
+
+        # if the player has a gun, they can shoot
+        # if the player has poison they can poison food or NPC's
+        # depending on the explosive type they can drop and detonate it automatically
+
             
     def takeDisguise(self):
         # check if player is close to the suit
@@ -121,26 +128,43 @@ class Player(Character):
                     
     def weaponAttack(self):
         currentItem = self.inventory.currentItem()
-
-        # subdue if NPC is close enough
-        if currentItem.name == 'fiberWire':
-            # check if npc is close to players
-            for npc in self.parent.npcs:                
-                if self.rect.colliderect(npc.rect):
-                    # subdue the npc
-                    self.subdue(npc)
-                    return
         
-        if self.inventory.isCurrentItemGun() and currentItem.count > 0 and self.inputDelay <= 0:
-            # if the player has bullets in the gun
+        
+        if currentItem.name == 'fiberWire':
+            self.fiberWire()
+            return
+        
+        # get the instance type of the item
+        currentItemType = type(currentItem)
+        if currentItemType == Gun and self.inputDelay <= 0:
             self.shoot()
-            
-            
+            return
+        
+        if currentItemType == Poison and self.inputDelay <= 0:
+            self.poison()
+            return
+    
+        if currentItemType == Explosive and self.inputDelay <= 0:
+            self.explode()
+            return
+        
+        if currentItemType == Food and self.inputDelay <= 0:
+            self.feed()
+            return
+        
+        if currentItemType == Item and self.inputDelay <= 0:
+            self.useItem()
+            return
 
-    def subdue(self, npc):
-        # drag the npc to the player
-        npc.gettingSubdued()
-        npc.rect.center = self.rect.center
+    # subdue if NPC is close enough
+    def fiberWire(self):
+        # check if npc is close to players
+        for npc in self.parent.npcs:                
+            if self.rect.colliderect(npc.rect):
+                # subdue the npc
+                npc.gettingSubdued()
+                npc.rect.center = self.rect.center
+                return
         
     def movement(self):
         keysPressed = pygame.key.get_pressed()

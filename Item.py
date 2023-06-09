@@ -7,9 +7,7 @@ class Item(pygame.sprite.Sprite, GameObject):
     def __init__(self, pos, group, parent, name, count=1):
         super().__init__(group)
         self.image = pygame.image.load(os.path.join("sprites", 'items', name + ".png")).convert_alpha()
-        # todo have a default sound, and put the gun in its own class
-        self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
-        self.rect = self.image.get_rect(center=pos)
+        self.rect = self.image.get_rect(center = pos)
         self.parent = parent
         self.name = name
         self.pickUpTime = 0
@@ -23,18 +21,18 @@ class Item(pygame.sprite.Sprite, GameObject):
         #print(f"dropped {self.name}")
         pass
 
-    def update(self):
+    def pickUp(self):
         self.pickUpTime = max(self.pickUpTime - 1, 0)
         if self.parent.player.rect.colliderect(self.rect) and self.pickUpTime <= 0 and pygame.key.get_pressed()[K_f]:
             self.parent.player.inventory.addItem(self)
             self.kill()
-                
+
+    def update(self):
+        self.pickUp()
+
 class Explosive(Item):
     def __init__(self, pos, group, parent, name = "bomb"):
         super().__init__(pos, group, parent, name)
-        self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
-        self.rect = self.image.get_rect(center = pos)
-        
         self.damage = 100
         self.damageRadius = 100
         self.soundRadius = 500
@@ -49,22 +47,28 @@ class Explosive(Item):
     def drop(self):
         print(f"dropped Explosive {self.name}")
         self.boolTriggered = True
-        #self.fuse.play()
+        self.fuse.play()
+
+    def ifTriggered(self):
+        if not self.boolTriggered: return
+        self.fuseTime -= 1
+        if (self.fuseTime <= 0): self.explode()
 
     def update(self):
         # trigger the explosive if the player is close enough
-        self.pickUpTime = max(self.pickUpTime - 1, 0)
-        #if self.parent.player.rect.colliderect(self.rect):
-            #print(f"Colliding with player with {self.name}")
-            #self.boolTriggered = True
-            #self.tryToPickUp()
-                
-        if (self.boolTriggered):
-            self.fuseTime -= 1
-            if (self.fuseTime <= 0):
-                self.explode()
-                
+        self.pickUp()
+        self.ifTriggered()
     
+    def alertNPCs(self):
+        for npc in self.parent.npcs:
+            # check if the npc is in the radius of sound
+            distance = self.getDistanceTo(npc)
+            if (distance <= self.soundRadius):
+                npc.setState('alert')
+                npc.setSearchPos(self.rect.center, self.soundRadius)
+            if (distance <= self.damageRadius):
+                npc.health -= self.damage
+
     def explode(self):
         self.sound.play()
 
@@ -74,15 +78,7 @@ class Explosive(Item):
         pygame.display.update()
 
         # check any characters in the sound radius
-        for npc in self.parent.npcs:
-            # check if the npc is in the radius of sound
-            distance = self.getDistanceTo(npc)
-            if (distance <= self.soundRadius):
-                npc.setState('alert')
-                npc.setSearchPos(self.rect.center, self.soundRadius)
-
-            if (distance <= self.damageRadius):
-                npc.health -= self.damage
+        self.alertNPCs()
 
         # explode explosives in the radius
         for explosive in self.parent.items:
@@ -95,18 +91,12 @@ class Explosive(Item):
 
         # remove the explosive from the map
         self.kill()
-        
-    def drop(self):
-        self.boolTriggered = True
-        self.fuse.play()
 
 # player can posion food
 # NPC can move, and eat food
 class Food(Item):
     def __init__(self, pos, group, parent, name = "food"):
         super().__init__(pos, group, parent, name)
-        self.image = pygame.image.load(os.path.join("sprites", 'items', name +".png")).convert_alpha()
-        self.rect = self.image.get_rect(center = pos)
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
 
@@ -135,7 +125,7 @@ class Food(Item):
         self.pickUpTime -= 1
         
         player = self.parent.player
-        if self.parent.player.rect.colliderect(self.rect):
+        if player.rect.colliderect(self.rect):
             if pygame.key.get_pressed()[K_e] and self.pickUpTime <= 0:
                 self.pickUpTime = 20
                 self.pickUp()
@@ -143,7 +133,6 @@ class Food(Item):
 class Poison(Item):
     def __init__(self, pos, group, parent, name = "ko"):
         super().__init__(pos, group, parent, name)
-        self.rect = self.image.get_rect(center = pos)
         self.posionType = ['injection', 'pill']
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
@@ -156,7 +145,6 @@ class Poison(Item):
 class Gun(Item):
     def __init__(self, pos, group, parent, name, count, fireRate):
         super().__init__(pos, group, parent, name, count)
-        self.rect = self.image.get_rect(center = pos)
         self.fireRate = fireRate
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
     

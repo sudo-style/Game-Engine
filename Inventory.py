@@ -91,7 +91,7 @@ class Inventory:
         self.inventory = self.inventory[1:] + self.inventory[:1]
 
     def drawAmmo(self):
-        if not self.isCurrentItemGun(): return
+        #if not self.isCurrentItemGun(): return
         gun = self.currentItem()
         font = pygame.font.SysFont(None, 30)
         ammo = font.render(str(gun.count), True, (255,255,255))
@@ -119,7 +119,7 @@ class Inventory:
             self.selectRight()
             self.interactDelay = 10
 
-        # e to interact
+        # e to interact # interactions should be in the player class right? 
         if keysPressed[K_e] and self.interactDelay <= 0:
             # guns
             if self.isCurrentItemGun():
