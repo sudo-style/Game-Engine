@@ -23,7 +23,9 @@ class Item(pygame.sprite.Sprite, GameObject):
 
     def pickUp(self):
         self.pickUpTime = max(self.pickUpTime - 1, 0)
-        if self.parent.player.rect.colliderect(self.rect) and self.pickUpTime <= 0 and pygame.key.get_pressed()[K_f]:
+        if self.pickUpTime > 0: return
+
+        if self.parent.player.rect.colliderect(self.rect) and pygame.key.get_pressed()[K_f]:
             self.parent.player.inventory.addItem(self)
             self.kill()
 
@@ -120,15 +122,8 @@ class Food(Item):
         if self.getPosionState()== 'ko':
             target.ko()
 
-
     def update(self):
-        self.pickUpTime -= 1
-        
-        player = self.parent.player
-        if player.rect.colliderect(self.rect):
-            if pygame.key.get_pressed()[K_e] and self.pickUpTime <= 0:
-                self.pickUpTime = 20
-                self.pickUp()
+        self.pickUp()
         
 class Poison(Item):
     def __init__(self, pos, group, parent, name = "ko"):

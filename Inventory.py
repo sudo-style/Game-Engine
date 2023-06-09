@@ -90,7 +90,7 @@ class Inventory:
     def selectRight(self):
         self.inventory = self.inventory[1:] + self.inventory[:1]
 
-    def drawAmmo(self):
+    def drawCount(self):
         #if not self.isCurrentItemGun(): return
         gun = self.currentItem()
         font = pygame.font.SysFont(None, 30)
@@ -102,7 +102,7 @@ class Inventory:
         currentItem = self.currentItem()
         keysPressed = pygame.key.get_pressed()
 
-        self.drawAmmo()
+        self.drawCount()
 
         # v toggles visibility
         if keysPressed[K_v] and self.interactDelay == 0:
@@ -117,36 +117,6 @@ class Inventory:
             self.interactDelay = 10
         if keysPressed[K_RIGHT] and self.interactDelay == 0:
             self.selectRight()
-            self.interactDelay = 10
-
-        # e to interact # interactions should be in the player class right? 
-        if keysPressed[K_e] and self.interactDelay <= 0:
-            # guns
-            if self.isCurrentItemGun():
-                self.shoot()
-                self.interactDelay = currentItem.fireRate
-                return
-            # poisons
-            # drop the poison, if it collides with a person, or food apply the poison
-            # otherwise just drop it on the ground
-            if self.isCurrentItemPoison():
-                self.grandparent.addPoison(currentItem)
-                self.removeCurrentItem()
-                self.interactDelay = 10
-                return
-            # explosives
-            if self.isCurrentItemExplosive():
-                self.grandparent.addExplosive(currentItem)
-                self.removeCurrentItem()
-                self.interactDelay = 10
-                return
-            # keeps
-            if self.isCurrentItemKeep():
-                currentItem.interact() # this will be the default behavior of all items?
-                self.interactDelay = 10
-                return
-            self.removeCurrentItem()
-            self.print()
             self.interactDelay = 10
 
     def drawCarousel(self):

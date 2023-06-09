@@ -35,8 +35,9 @@ class Player(Character):
     
     def shoot(self):
         gun = self.inventory.currentItem()
-        print(gun.count)
+        if self.inputDelay > 0: return
         if gun.count <= 0: return
+
 
         self.inventory.shoot()
         self.inputDelay = 30
@@ -46,8 +47,8 @@ class Player(Character):
         mouse_pos = pygame.mouse.get_pos()
 
         # Calculate the ray direction
-        delta_x = mouse_pos[0] - player_pos[0] 
-        delta_y = mouse_pos[1] - player_pos[1] 
+        delta_x = mouse_pos[0] - player_pos[0]
+        delta_y = mouse_pos[1] - player_pos[1]
         playerToMouseAngle = math.atan2(delta_y, delta_x)
 
         # Calculate a long line endpoint based on the ray direction
@@ -100,9 +101,13 @@ class Player(Character):
         # if m is pressed,
         keysPressed = pygame.key.get_pressed()
  
-        if keysPressed[K_b]:
-            self.weaponAttack()
+        if keysPressed[K_e]:
+            self.interact()
  
+        # if the player clicks the mouse, they can shoot
+        if pygame.mouse.get_pressed()[0] and type(self.inventory.currentItem()) == Gun:
+            self.shoot()
+
         if keysPressed[K_t] and self.inputDelay <= 0:
             self.inputDelay = 30 # don't want them to accidentally spam it
             self.takeDisguise()
@@ -126,34 +131,11 @@ class Player(Character):
                     self.original_image = pygame.image.load(os.path.join('sprites', 'character', self.suitName, self.suitName + '.png')).convert_alpha()
                     npc.original_image = pygame.image.load(os.path.join('sprites', 'character', npc.suitName, npc.suitName + '.png')).convert_alpha()
                     
-    def weaponAttack(self):
-        currentItem = self.inventory.currentItem()
-        
-        
+    def interact(self):
+        # interactions are close to another object i.e npc, food, item, etc.
+        currentItem = self.inventory.currentItem() # gets the closest npc to player and if close enough, subdues them
         if currentItem.name == 'fiberWire':
             self.fiberWire()
-            return
-        
-        # get the instance type of the item
-        currentItemType = type(currentItem)
-        if currentItemType == Gun and self.inputDelay <= 0:
-            self.shoot()
-            return
-        
-        if currentItemType == Poison and self.inputDelay <= 0:
-            self.poison()
-            return
-    
-        if currentItemType == Explosive and self.inputDelay <= 0:
-            self.explode()
-            return
-        
-        if currentItemType == Food and self.inputDelay <= 0:
-            self.feed()
-            return
-        
-        if currentItemType == Item and self.inputDelay <= 0:
-            self.useItem()
             return
 
     # subdue if NPC is close enough
