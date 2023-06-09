@@ -112,6 +112,11 @@ class Player(Character):
             self.inputDelay = 30 # don't want them to accidentally spam it
             self.takeDisguise()
 
+        if keysPressed[K_z] and self.inputDelay == 0:
+            self.inventory.dropItem(self.pos)
+            self.inputDelay = 30
+
+            print(self.parent.items)
         # if the player has a gun, they can shoot
         # if the player has poison they can poison food or NPC's
         # depending on the explosive type they can drop and detonate it automatically

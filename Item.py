@@ -18,8 +18,9 @@ class Item(pygame.sprite.Sprite, GameObject):
         pass
 
     def drop(self):
-        #print(f"dropped {self.name}")
+        print(f"dropped {self.name}")
         pass
+        
 
     def pickUp(self):
         self.pickUpTime = max(self.pickUpTime - 1, 0)
@@ -33,7 +34,7 @@ class Item(pygame.sprite.Sprite, GameObject):
         self.pickUp()
 
 class Explosive(Item):
-    def __init__(self, pos, group, parent, name = "bomb"):
+    def __init__(self, pos, group, parent, name = "bomb", count = 1):
         super().__init__(pos, group, parent, name)
         self.damage = 100
         self.damageRadius = 100
@@ -97,7 +98,7 @@ class Explosive(Item):
 # player can posion food
 # NPC can move, and eat food
 class Food(Item):
-    def __init__(self, pos, group, parent, name = "food"):
+    def __init__(self, pos, group, parent, name = "food", count = 1):
         super().__init__(pos, group, parent, name)
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
@@ -126,7 +127,7 @@ class Food(Item):
         self.pickUp()
         
 class Poison(Item):
-    def __init__(self, pos, group, parent, name = "ko"):
+    def __init__(self, pos, group, parent, name = "ko", count = 1):
         super().__init__(pos, group, parent, name)
         self.posionType = ['injection', 'pill']
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
@@ -138,7 +139,7 @@ class Poison(Item):
         self.kill()
 
 class Gun(Item):
-    def __init__(self, pos, group, parent, name, count, fireRate):
+    def __init__(self, pos, group, parent, name, count, fireRate = 10):
         super().__init__(pos, group, parent, name, count)
         self.fireRate = fireRate
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))

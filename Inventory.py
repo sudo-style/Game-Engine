@@ -4,7 +4,7 @@ import os
 import math
 
 
-from Item import Item, Poison, Explosive
+from Item import Item, Poison, Explosive, Gun, Food
 from CameraGroup import CameraGroup
 
 
@@ -13,8 +13,6 @@ class Inventory:
     def __init__(self, grandparent):
         self.grandparent = grandparent
         self.inventory = []
-        item = Item((0,0), grandparent.camera_group, grandparent, 'fiberWire')
-        self.addItem(item)
         self.visible = True
         self.interactDelay = 0
 
@@ -43,10 +41,22 @@ class Inventory:
             if item.name == name:
                 item.count = min(item.count, self.maxInventory()[name])    
 
-    def removeCurrentItem(self):
-        self.inventory[0].count -= 1
-        if self.inventory[0].count <= 0:
-            self.inventory.pop(0)
+    def dropItem(self, pos):
+        currentItem = self.currentItem()
+        # don't drop keeps
+        if self.isCurrentItemKeep(): return
+        
+        currentItem.pos = pos
+        self.grandparent.items.append(currentItem)
+        currentItem.group = self.grandparent.camera_group
+        currentItem.parent = self.grandparent
+        
+        currentType = type(currentItem)
+        item = currentType(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.count)
+        self.grandparent.items.append(item)
+
+        self.inventory.remove(currentItem)
+        return
 
     def currentItem(self):
         return self.inventory[0]
@@ -59,7 +69,6 @@ class Inventory:
         
     def selectRight(self):
         self.inventory = self.inventory[1:] + self.inventory[:1]
-
 
     def maxInventory(self):
         return {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':20}  
@@ -81,7 +90,7 @@ class Inventory:
     
     def isCurrentItemKeep(self):
         keep = self.currentItem().name
-        keeps = ['fiberWire', 'camera']
+        keeps = ['camera']
         return keep in keeps
 
     def shoot(self):
@@ -93,11 +102,12 @@ class Inventory:
         gun.count -= 1
 
     def drawCount(self):
-        #if not self.isCurrentItemGun(): return
-        gun = self.currentItem()
+        if len(self.inventory) == 0: return
+        item = self.currentItem()
         font = pygame.font.SysFont(None, 30)
-        ammo = font.render(str(gun.count), True, (255,255,255))
-        self.grandparent.screen.blit(ammo, (0,0))
+        countText = font.render(str(item.count), True, (255,255,255))
+        self.grandparent.screen.blit(countText, (0,0))
+        self.grandparent.screen.blit(item.image, (0, 30))
 
     def drawCarousel(self):
         pygame.draw.rect(self.grandparent.screen, (255,255,255), (0, self.grandparent.height - 100, self.grandparent.width, 100))
@@ -107,9 +117,8 @@ class Inventory:
 
     def update(self):
         self.interactDelay = max(0, self.interactDelay - 1)
-        currentItem = self.currentItem()
         keysPressed = pygame.key.get_pressed()
-
+        
         self.drawCount()
 
         # v toggles visibility
@@ -118,7 +127,6 @@ class Inventory:
             self.interactDelay = 10
 
         if not self.visible: return
-
         # left and right arrows to switch items
         if keysPressed[K_LEFT] and self.interactDelay == 0:
             self.selectLeft()
@@ -126,4 +134,3 @@ class Inventory:
         if keysPressed[K_RIGHT] and self.interactDelay == 0:
             self.selectRight()
             self.interactDelay = 10
-            
