@@ -112,7 +112,7 @@ class Player(Character):
             self.inputDelay = 30 # don't want them to accidentally spam it
             self.takeDisguise()
 
-        if keysPressed[K_z] and self.inputDelay == 0:
+        if keysPressed[K_z] and self.inputDelay == 0 and len(self.inventory.inventory) > 0:
             self.inventory.dropItem(self.pos)
             self.inputDelay = 30
 
