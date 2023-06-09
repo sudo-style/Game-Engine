@@ -11,7 +11,7 @@ poisons = ['ko', 'lethal', 'emetic']
 class Inventory:
     def __init__(self, grandparent):
         self.grandparent = grandparent
-        self.maxInventory = {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':20}  
+        self.maxInventory = {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':6}  
         self.inventory = {}
         self.updated = []
         self.addItem('fiberWire')
