@@ -20,13 +20,28 @@ class Inventory:
 
     def addItem(self, Item):
         desiredName = Item.name
+
+        # item not in inventory
+        if desiredName not in self.maxInventory():
+            self.inventory = [Item] + self.inventory
+            return
         
+        # remove the item from the inventory array
         for item in self.inventory:
             if item.name == desiredName:
-                item.count += Item.count
-                return
-        self.inventory.append(Item)
+                Item.count += item.count
+                self.inventory.remove(item)
+        
+        # this is done so items are added to the front of the array
+        self.inventory = [Item] + self.inventory
+        self.limitInventoryToMax(desiredName)
     
+    def limitInventoryToMax(self, name):
+        if name not in self.maxInventory(): return
+        for item in self.inventory:
+            if item.name == name:
+                item.count = min(item.count, self.maxInventory()[name])
+        
     def removeCurrentItem(self):
         self.inventory[0].count -= 1
         if self.inventory[0].count <= 0:
@@ -110,14 +125,37 @@ class Inventory:
             self.selectRight()
             self.interactDelay = 10
 
-    
-    
 
+        # e to interact
+        if keysPressed[K_e] and self.interactDelay <= 0:
+            # guns
+            if self.isCurrentItemGun():
+                self.shoot()
+                self.interactDelay = currentItem.fireRate
+                return
+            # poisons
+            # drop the poison, if it collides with a person, or food apply the poison
+            # otherwise just drop it on the ground
+            if self.isCurrentItemPoison():
+                self.grandparent.addPoison(currentItem)
+                self.removeCurrentItem()
+                self.interactDelay = 10
+                return
+            # explosives
+            if self.isCurrentItemExplosive():
+                self.grandparent.addExplosive(currentItem)
+                self.removeCurrentItem()
+                self.interactDelay = 10
+                return
+            # keeps
+            if self.isCurrentItemKeep():
+                currentItem.interact() # this will be the default behavior of all items?
+                self.interactDelay = 10
+                return
+            self.removeCurrentItem()
+            self.print()
+            self.interactDelay = 10
 
-
-
-
-        
 def main():
     pygame.init()
     inventory = Inventory(None)

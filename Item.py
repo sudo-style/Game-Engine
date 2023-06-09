@@ -16,6 +16,9 @@ class Item(pygame.sprite.Sprite, GameObject):
         self.count = count
         self.pos = pos
     
+    def interact(self):
+        pass
+
     def drop(self):
         print(f"dropped {self.name}")
     
@@ -172,3 +175,12 @@ class Poison(Item):
         print(f"{target.name} was poisoned")
         target.poisoned(self.poisonState)
         self.kill()
+
+class Gun(Item):
+    def __init__(self, pos, group, parent, fireRate, name = 'gun'):
+        super().__init__(pos, group, parent, name)
+        self.rect = self.image.get_rect(center = pos)
+        self.parent = parent
+        self.fireRate = fireRate
+    
+    
