@@ -20,7 +20,6 @@ class Item(pygame.sprite.Sprite, GameObject):
     def drop(self):
         print(f"dropped {self.name}")
         pass
-        
 
     def pickUp(self):
         self.pickUpTime = max(self.pickUpTime - 1, 0)

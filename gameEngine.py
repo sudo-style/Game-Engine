@@ -10,7 +10,7 @@ from GameObject import GameObject
 def main():
     pygame.init()
     width = 1920
-    height = 1080
+    height = 720
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Hitman")
     clock = pygame.time.Clock()

@@ -20,10 +20,8 @@ class Inventory:
         for item in self.inventory:
             print(f"{item.name} {item.count}")
     
-
     def addItem(self, Item):
         desiredName = Item.name
-     
         # remove the item from the inventory array
         for item in self.inventory:
             if item.name == desiredName:
@@ -44,17 +42,11 @@ class Inventory:
     def dropItem(self, pos):
         currentItem = self.currentItem()
         # don't drop keeps
-        if self.isCurrentItemKeep(): return
-        
-        currentItem.pos = pos
-        self.grandparent.items.append(currentItem)
-        currentItem.group = self.grandparent.camera_group
-        currentItem.parent = self.grandparent
-        
+        if self.isCurrentItemKeep(): return    
         currentType = type(currentItem)
         item = currentType(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.count)
         self.grandparent.items.append(item)
-
+        self.grandparent.items[-1].drop()
         self.inventory.remove(currentItem)
         return
 

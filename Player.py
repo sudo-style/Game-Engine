@@ -16,7 +16,6 @@ from random import randint
 
 white = (255, 255, 255)
 
-
 class Player(Character):
     def __init__(self, pos, group, parent, name = "player"):
         super().__init__(pos, group, parent, name)
@@ -101,7 +100,7 @@ class Player(Character):
         # if m is pressed,
         keysPressed = pygame.key.get_pressed()
  
-        if keysPressed[K_e]:
+        if keysPressed[K_e] and len(self.inventory.inventory) > 0 and self.inputDelay == 0:
             self.interact()
  
         # if the player clicks the mouse, they can shoot
@@ -116,11 +115,9 @@ class Player(Character):
             self.inventory.dropItem(self.pos)
             self.inputDelay = 30
 
-            print(self.parent.items)
         # if the player has a gun, they can shoot
         # if the player has poison they can poison food or NPC's
         # depending on the explosive type they can drop and detonate it automatically
-
             
     def takeDisguise(self):
         # check if player is close to the suit
@@ -139,20 +136,25 @@ class Player(Character):
     def interact(self):
         # interactions are close to another object i.e npc, food, item, etc.
         currentItem = self.inventory.currentItem() # gets the closest npc to player and if close enough, subdues them
-        if currentItem.name == 'fiberWire':
-            self.fiberWire()
+        # find a way to just get the items that it is coliding with 
+        
+        
+        touchingNPCs = self.rect.collideobjects(self.parent.npcs)
+        touchingItems = self.rect.collideobjects(self.parent.npcs)
+        touchingFoods = self.rect.collideobjects(self.parent.npcs)
+        
+        if currentItem.name == 'fiberWire' and not touchingNPCs == None:
+            self.fiberWire(touchingNPCs)
             return
 
     # subdue if NPC is close enough
-    def fiberWire(self):
+    def fiberWire(self, target):
         # check if npc is close to players
-        for npc in self.parent.npcs:                
-            if self.rect.colliderect(npc.rect):
-                # subdue the npc
-                npc.gettingSubdued()
-                npc.rect.center = self.rect.center
-                return
-        
+        # subdue the npc
+        self.inputDelay = 0
+        target.gettingSubdued()
+        target.rect.center = self.rect.center
+                
     def movement(self):
         keysPressed = pygame.key.get_pressed()
         if keysPressed[K_w]: self.direction.y -= 1

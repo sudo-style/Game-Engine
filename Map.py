@@ -29,6 +29,8 @@ class Map:
         # adding food to the map
         self.addFood((200,500), 'apple')
 
+        self.addItem((0,0),'fiberWire')
+
         # add player to the map
         self.player = Player((width/2, height/2), self.camera_group, self, 'player')
 
