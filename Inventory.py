@@ -57,9 +57,11 @@ class Inventory:
         return self.inventory[0].count
 
     def selectLeft(self):
+        self.visible = True
         self.inventory = [self.inventory[-1]] + self.inventory[0:-1]
         
     def selectRight(self):
+        self.visible = True
         self.inventory = self.inventory[1:] + self.inventory[:1]
 
     def maxInventory(self):
@@ -98,9 +100,11 @@ class Inventory:
         item = self.currentItem()
         font = pygame.font.SysFont(None, 30)
         countText = font.render(str(item.count), True, (255,255,255))
+        nameText = font.render(str(item.name), True, (255,255,255))
         self.grandparent.screen.blit(countText, (0,0))
+        self.grandparent.screen.blit(nameText, (90,60))
         self.grandparent.screen.blit(item.image, (0, 30))
-
+        
     def drawCarousel(self):
         pygame.draw.rect(self.grandparent.screen, (255,255,255), (0, self.grandparent.height - 100, self.grandparent.width, 100))
         for i in range(len(self.inventory)):
@@ -117,12 +121,15 @@ class Inventory:
         if keysPressed[K_v] and self.interactDelay == 0:
             self.visible = not self.visible
             self.interactDelay = 10
-
-        if not self.visible: return
-        # left and right arrows to switch items
+        
         if keysPressed[K_LEFT] and self.interactDelay == 0:
             self.selectLeft()
             self.interactDelay = 10
         if keysPressed[K_RIGHT] and self.interactDelay == 0:
             self.selectRight()
             self.interactDelay = 10
+            
+
+        if not self.visible: return
+        # left and right arrows to switch items
+        

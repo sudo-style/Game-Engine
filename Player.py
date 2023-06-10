@@ -144,6 +144,7 @@ class Player(Character):
         touchingFoods = self.rect.collideobjects(self.parent.npcs)
         
         if currentItem.name == 'fiberWire' and not touchingNPCs == None:
+            # it might be better if checking every frame, it will grab an object temporarily, moving the pos for both 
             self.fiberWire(touchingNPCs)
             return
 

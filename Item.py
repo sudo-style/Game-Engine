@@ -131,6 +131,41 @@ class Poison(Item):
         self.posionType = ['injection', 'pill']
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
+        self.enabled = True
+        self.poisoned = False
+        self.timer = 100
+
+    def update(self):
+        if self.poisoned: 
+            self.timer = max(self.timer-1, 0)
+        
+        if self.timer == 0:
+            self.enabled = True
+            if self.poisoned: self.kill()
+            self.timer = 100
+
+        if self.enabled: self.pickUp()
+
+    def drop(self):
+        self.poisoned = False
+        touchingNPCs = self.rect.collideobjectsall(self.parent.npcs)
+        touchingFoods = self.rect.collideobjectsall(self.parent.foods)
+
+        for npc in touchingNPCs: 
+            self.enabled = False
+            self.poisoned = True
+            npc.ko()
+            print("KNOCKOUT\t\tKNOCKOUT")
+
+        for food in touchingFoods:
+            self.enabled = False
+            self.poisoned = True
+            food.gettingPoisoned('ko')
+            print(f"poisoned {food.name}")
+        # when dropped it will try to poison the colliders either food or NPC 
+        # after 3 seconds it will disapear, showing that it has infected that area
+        
+        
     
     def poison(self, target):
         print(f"{target.name} was poisoned")
