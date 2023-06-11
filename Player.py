@@ -147,6 +147,7 @@ class Player(Character):
             # it might be better if checking every frame, it will grab an object temporarily, moving the pos for both 
             self.fiberWire(touchingNPCs)
             return
+         
 
     # subdue if NPC is close enough
     def fiberWire(self, target):

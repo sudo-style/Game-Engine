@@ -117,10 +117,11 @@ class Food(Item):
             return
         print(f"{target.name} was poisoned")
         target.setState(self.poisonStates[self.poisonState])
-        self.kill()
+        
 
-        if self.getPosionState()== 'ko':
-            target.ko()
+        if self.getPosionState()== 'ko': target.ko()
+
+        self.kill()
 
     def update(self):
         self.pickUp()
@@ -128,7 +129,7 @@ class Food(Item):
 class Poison(Item):
     def __init__(self, pos, group, parent, name = "ko", count = 1):
         super().__init__(pos, group, parent, name)
-        self.posionType = ['injection', 'pill']
+        self.poisonType = 'pill'
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
         self.enabled = True
@@ -148,25 +149,25 @@ class Poison(Item):
 
     def drop(self):
         self.poisoned = False
-        touchingNPCs = self.rect.collideobjectsall(self.parent.npcs)
-        touchingFoods = self.rect.collideobjectsall(self.parent.foods)
-
-        for npc in touchingNPCs: 
-            self.enabled = False
-            self.poisoned = True
-            npc.ko()
-            print("KNOCKOUT\t\tKNOCKOUT")
-
-        for food in touchingFoods:
-            self.enabled = False
-            self.poisoned = True
-            food.gettingPoisoned('ko')
-            print(f"poisoned {food.name}")
+        
+        if self.poisonType == 'injection':
+            touchingNPCs = self.rect.collideobjectsall(self.parent.npcs)
+            for npc in touchingNPCs: 
+                self.enabled = False
+                self.poisoned = True
+                npc.ko()
+                print("KNOCKOUT\t\tKNOCKOUT")
+        
+        if self.poisonType == 'pill':
+            touchingFoods = self.rect.collideobjectsall(self.parent.foods)
+            for food in touchingFoods:
+                self.enabled = False
+                self.poisoned = True
+                food.gettingPoisoned('ko')
+                print(f"poisoned {food.name}")
         # when dropped it will try to poison the colliders either food or NPC 
         # after 3 seconds it will disapear, showing that it has infected that area
         
-        
-    
     def poison(self, target):
         print(f"{target.name} was poisoned")
         target.poisoned(self.poisonState)

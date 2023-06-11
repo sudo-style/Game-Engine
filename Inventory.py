@@ -13,7 +13,7 @@ class Inventory:
     def __init__(self, grandparent):
         self.grandparent = grandparent
         self.inventory = []
-        self.visible = True
+        self.visible = False
         self.interactDelay = 0
 
     def print(self):
@@ -43,8 +43,7 @@ class Inventory:
         currentItem = self.currentItem()
         # don't drop keeps
         if self.isCurrentItemKeep(): return    
-        currentType = type(currentItem)
-        item = currentType(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.count)
+        item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.count)
         self.grandparent.items.append(item)
         self.grandparent.items[-1].drop()
         self.inventory.remove(currentItem)
