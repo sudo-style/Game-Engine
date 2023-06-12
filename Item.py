@@ -225,3 +225,25 @@ class Camera(Item):
 		
 	def interact(self):
 		self.camera_group.takeScreenshot(self.parent.player)
+
+class Exit(Item):
+	def __init__(self, pos, group, parent, name = 'exit'):
+		super().__init__(pos, group, parent, name)
+
+	def pickUp(self):
+		pass
+
+	def update(self):
+		# check if the player is touching the exit
+		if self.rect.colliderect(self.parent.player.rect): 
+			# check if all of the NPC's are dead
+			for npc in self.parent.npcs:
+				print(npc.health)
+			print("\n")
+			for npc in self.parent.npcs:
+				print(npc.health)
+				if npc.health > 0: return
+
+			# todo make this go to see the score
+			self.kill()
+				

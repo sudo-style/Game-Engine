@@ -4,7 +4,7 @@ import os
 import math
 from random import randint
 
-from Item import Item, Explosive, Food, Poison, Gun, Camera, Grenade, RemoteExplosive
+from Item import Item, Explosive, Food, Poison, Gun, Camera, Grenade, RemoteExplosive, Exit
 from Character import Character
 from Player import Player
 from NPC import NPC, Guard
@@ -51,6 +51,7 @@ class Map:
 		self.addGrenade((width/2 - 200, height/2 - 200))
 
 		self.addRemoteExplosive((width/2 - 300, height/2 - 300))
+		self.addExit((width/2 - 500, height/2 - 500))
 	
 	def addRemoteExplosive(self, pos):
 		remoteExplosive = RemoteExplosive(pos, self.camera_group, self)
@@ -91,3 +92,7 @@ class Map:
 	def addCamera(self, pos):
 		camera = Camera(pos, self.camera_group, self, 'camera')
 		self.items.append(camera)
+
+	def addExit(self, pos):
+		exit = Exit(pos, self.camera_group, self, 'exit')
+		self.items.append(exit)
