@@ -47,14 +47,10 @@ class Explosive(Item):
         self.fuse = pygame.mixer.Sound(os.path.join("sounds", "fuse.mp3"))
     
     def drop(self):
-        print(f"dropped Explosive {self.name}")
-        self.boolTriggered = True
-        self.fuse.play()
+        pass
 
     def ifTriggered(self):
-        if not self.boolTriggered: return
-        self.fuseTime -= 1
-        if (self.fuseTime <= 0): self.explode()
+        pass
 
     def update(self):
         # trigger the explosive if the player is close enough
@@ -92,6 +88,51 @@ class Explosive(Item):
                 explosive.explode()
 
         # remove the explosive from the map
+        self.kill()
+
+class Grenade(Explosive):
+    def __init__(self, pos, group, parent, name = 'grenade'):
+        super().__init__(pos, group, parent, 'grenade')
+    
+    def drop(self):
+        print(f"dropped Explosive {self.name}")
+        self.boolTriggered = True
+        self.fuse.play()
+    
+    def ifTriggered(self):
+        if not self.boolTriggered: return
+        self.fuseTime -= 1
+        if (self.fuseTime <= 0): self.explode()
+
+class RemoteExplosive(Explosive):
+    def __init__(self, pos, group, parent, name = 'remote explosive'):
+        super().__init__(pos, group, parent, 'remote explosive')
+             
+    def drop(self):
+        # add a trigger button to the players inventory
+        # if they press the trigger, then the original explosive will explode
+        trigger = Trigger((self.rect.center), self.parent.camera_group, self.parent, self, 'trigger')
+        self.parent.player.inventory.addItem(trigger)
+        pass
+
+    def ifTriggered(self):
+        
+        #self.explode()
+        pass
+
+class Trigger(Item): # this will only exist in the player inventory, they can't drop it, once they use it it will be removed from the inventory
+    def __init__(self, pos, group, parent, explosiveParent, name = "trigger"):
+        super().__init__(pos, group, parent, name)
+        self.explosiveParent = explosiveParent
+
+    def drop(self):
+        pass
+
+    def update(self):
+        self.kill()
+
+    def interact(self):
+        self.explosiveParent.explode()
         self.kill()
 
 # player can poison food

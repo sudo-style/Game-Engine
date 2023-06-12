@@ -6,7 +6,7 @@ from GameObject import GameObject
 from Character import Character
 from Inventory import Inventory
 
-from Item import Item, Poison, Explosive, Gun, Food, Camera
+from Item import Item, Poison, Explosive, Gun, Food, Camera, RemoteExplosive, Trigger
 
 
 #from Blood import Blood
@@ -148,9 +148,15 @@ class Player(Character):
             self.fiberWire(touchingNPCs)
             return
         
-        if type(currentItem) == Camera and pygame.key.get_pressed()[K_e]:
+        if type(currentItem) == Camera:
             self.inputDelay = 30
             currentItem.interact()
+            return
+
+        if type(currentItem) == Trigger:
+            self.inputDelay = 30
+            currentItem.interact()
+            print("player has triggered the explosive")
             return
          
 

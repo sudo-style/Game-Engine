@@ -83,7 +83,7 @@ class Inventory:
     
     def isCurrentItemKeep(self):
         keep = self.currentItem().name
-        keeps = ['camera']
+        keeps = ['camera', 'trigger']
         return keep in keeps
 
     def shoot(self):
