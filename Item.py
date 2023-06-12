@@ -94,7 +94,7 @@ class Explosive(Item):
         # remove the explosive from the map
         self.kill()
 
-# player can posion food
+# player can poison food
 # NPC can move, and eat food
 class Food(Item):
     def __init__(self, pos, group, parent, name = "food"):
@@ -102,22 +102,22 @@ class Food(Item):
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
 
-    def getPosionState(self):
+    def getPoisonState(self):
         return self.poisonStates[self.poisonState]
     
     def gettingPoisoned(self, state):
-        print('food is poisioned')
+        print('food is poisoned')
         self.poisonState = self.poisonStates.index(state)
     
     def eat(self, target):
-        # if the food was posioned then the target will be posioned
+        # if the food was poisoned then the target will be poisoned
         if (self.poisonStates[self.poisonState] == 'none'):
             print("MMM, that was good")
             self.kill()
             return
         print(f"{target.name} was poisoned")
         target.setState(self.poisonStates[self.poisonState])
-        if self.getPosionState()== 'ko': target.ko()
+        if self.getPoisonState()== 'ko': target.ko()
         self.kill()
 
     def update(self):
@@ -164,7 +164,7 @@ class Poison(Item):
                 food.gettingPoisoned('ko')
                 print(f"poisoned {food.name}")
         # when dropped it will try to poison the colliders either food or NPC 
-        # after 3 seconds it will disapear, showing that it has infected that area
+        # after 3 seconds it will disappear, showing that it has infected that area
         
     def poison(self, target):
         print(f"{target.name} was poisoned")

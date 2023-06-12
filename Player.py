@@ -136,7 +136,7 @@ class Player(Character):
     def interact(self):
         # interactions are close to another object i.e npc, food, item, etc.
         currentItem = self.inventory.currentItem() # gets the closest npc to player and if close enough, subdues them
-        # find a way to just get the items that it is coliding with 
+        # find a way to just get the items that it is colliding with 
         
         
         touchingNPCs = self.rect.collideobjects(self.parent.npcs)

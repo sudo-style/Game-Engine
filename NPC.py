@@ -87,7 +87,7 @@ class NPC(Character):
         if waypointState == 'dir': self.rotate() # rotate to the direction 
         if waypointState == 'eat': self.eat() # rotate to the direction
         
-        # goes to the begining of the path
+        # goes to the beginning of the path
         if self.lenWaypoints() == 0: self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy
 
     def rotate(self):
@@ -119,7 +119,7 @@ class NPC(Character):
     def alert(self):
         # be idle for a couple seconds, then go to the position of the alert sound
         # make a new waypoint for the NPC
-        print("allerted")
+        print("alerted")
         self.waypoints = [['search', 200], ['dir', 45], ['search', 200], ['dir', 135], ['search', 200], ['patrol' , self.searchPos], ['idle', 200]]
         self.setState('patrol')
 
@@ -219,5 +219,5 @@ class Guard(NPC):
         if waypointState == 'idle': self.idle()  # pause for self.waypoints[self.waypointIndex][1] frames
         if waypointState == 'dir': self.rotate() # rotate to the direction 
         
-        # goes to the begining of the path
+        # goes to the beginning of the path
         if self.lenWaypoints() == 0: self.waypoints = copy.deepcopy(self.originalWaypoints)  # Restore original waypoints using deep copy

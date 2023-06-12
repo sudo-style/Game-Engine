@@ -14,7 +14,7 @@ from GameObject import GameObject
 class Map:
     def __init__(self, name, width, height, screen, clock, fps, camera_group):
         self.name = name
-        self.descritpion = ""
+        self.description = ""
         self.targets, self.rooms, self.items, self.npcs, self.foods = [], [], [], [], []
         self.original_sprite = pygame.image.load(os.path.join("sprites", 'map', "GroundFloor.png"))
         self.sprite = self.original_sprite.copy()
