@@ -16,7 +16,7 @@ def main():
 	clock = pygame.time.Clock()
 	fps = 60
 	camera_group = CameraGroup()
-	mission = Map("Hawkes Bay", width, height, screen, clock, fps, camera_group)
+	mission = Map("Hawke's Bay", width, height, screen, clock, fps, camera_group)
 
 	while True:
 		for event in pygame.event.get():
