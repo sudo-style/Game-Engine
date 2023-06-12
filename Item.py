@@ -133,7 +133,7 @@ class Trigger(Item): # this will only exist in the player inventory, they can't 
 
     def interact(self):
         self.explosiveParent.explode()
-        self.kill()
+        self.parent.player.inventory.removeItem(self)
 
 # player can poison food
 # NPC can move, and eat food

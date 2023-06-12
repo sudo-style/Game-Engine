@@ -20,6 +20,9 @@ class Inventory:
         for item in self.inventory:
             print(f"{item.name} {item.count}")
     
+    def removeItem(self, obj):
+        self.inventory.remove(obj)
+
     def addItem(self, Item):
         desiredName = Item.name
         # remove the item from the inventory array
