@@ -22,7 +22,7 @@ class CameraGroup(pygame.sprite.Group):
         self.camera_rect = pygame.Rect(l,t,w,h)
 
         # ground
-        self.ground_surf = pygame.image.load('sprites/map/GroundFloor.png').convert_alpha()
+        self.ground_surf = pygame.image.load('sprites/map/GroundFloor.png')
         self.ground_rect = self.ground_surf.get_rect(topleft = (0,0))
 
         # camera speed
@@ -76,3 +76,8 @@ class CameraGroup(pygame.sprite.Group):
         scaled_rect = scaled_surf.get_rect(center = (self.half_w,self.half_h))
 
         self.display_surface.blit(scaled_surf,scaled_rect)
+    
+    def takeScreenshot(self, player):
+        self.custom_draw(player)
+        pygame.image.save(self.display_surface, 'screenshots/screenshot.png')
+        

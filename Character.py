@@ -3,7 +3,6 @@ from pygame.locals import *
 import os
 #from Inventory import Inventory
 from GameObject import GameObject
-#from Blood import Blood
 import math 
 import copy
 from random import randint

@@ -219,12 +219,9 @@ class Gun(Item):
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
     
 class Camera(Item):
-    def __init__(self, pos, group, parent, name):
-        super().__init__(pos, group, parent, name)
-        #self.sound = pygame.mixer.Sound(os.path.join("sounds", "camera.wav"))
+    def __init__(self, pos, camera_group, parent, name):
+        super().__init__(pos, camera_group, parent, name)
+        self.camera_group = camera_group
+        
     def interact(self):
-        # take a picture of the screen and save it to the folder
-        pygame.image.save(self.parent.screen, os.path.join("screenshots", "test.png"))
-        #self.sound.play()
-        print("picture taken")
-    
+        self.camera_group.takeScreenshot(self.parent.player)

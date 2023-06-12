@@ -42,7 +42,7 @@ class Map:
         self.addPoison((300, 600), 'knockout pill', 'ko', 'pill')
         self.addPoison((300, 600), 'knockout injection','ko', 'injection')
 
-        self.addCamera((100,100))
+        self.addCamera((700,700))
 
 
         self.addNPC((width/2, height/2), 'clown')
