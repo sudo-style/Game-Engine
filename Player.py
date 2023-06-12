@@ -36,10 +36,7 @@ class Player(Character):
         gun = self.inventory.currentItem()
         if self.inputDelay > 0: return
         if gun.count <= 0: return
-
-
         self.inventory.shoot()
-        self.inputDelay = 30
         gun.sound.play()        
         # Get the player's position
         player_pos = self.rect.center
@@ -106,6 +103,7 @@ class Player(Character):
         # if the player clicks the mouse, they can shoot
         if pygame.mouse.get_pressed()[0] and type(self.inventory.currentItem()) == Gun:
             self.shoot()
+            self.inputDelay = self.inventory.currentItem().fireRate
 
         if keysPressed[K_t] and self.inputDelay <= 0:
             self.inputDelay = 30 # don't want them to accidentally spam it
@@ -114,10 +112,6 @@ class Player(Character):
         if keysPressed[K_z] and self.inputDelay == 0 and len(self.inventory.inventory) > 0:
             self.inventory.dropItem(self.pos)
             self.inputDelay = 30
-
-        # if the player has a gun, they can shoot
-        # if the player has poison they can poison food or NPC's
-        # depending on the explosive type they can drop and detonate it automatically
             
     def takeDisguise(self):
         # check if player is close to the suit
