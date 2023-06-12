@@ -43,7 +43,7 @@ class Inventory:
         currentItem = self.currentItem()
         # don't drop keeps
         if self.isCurrentItemKeep(): return    
-        item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.count)
+        item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
         self.grandparent.items.append(item)
         self.grandparent.items[-1].drop()
         self.inventory.remove(currentItem)
@@ -56,11 +56,11 @@ class Inventory:
         return self.inventory[0].count
 
     def selectLeft(self):
-        self.visible = True
+        if len(self.inventory) == 0: return
         self.inventory = [self.inventory[-1]] + self.inventory[0:-1]
         
     def selectRight(self):
-        self.visible = True
+        if len(self.inventory) == 0: return
         self.inventory = self.inventory[1:] + self.inventory[:1]
 
     def maxInventory(self):

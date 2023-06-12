@@ -33,7 +33,7 @@ class Item(pygame.sprite.Sprite, GameObject):
         self.pickUp()
 
 class Explosive(Item):
-    def __init__(self, pos, group, parent, name = "bomb", count = 1):
+    def __init__(self, pos, group, parent, name = "bomb"):
         super().__init__(pos, group, parent, name)
         self.damage = 100
         self.damageRadius = 100
@@ -97,7 +97,7 @@ class Explosive(Item):
 # player can posion food
 # NPC can move, and eat food
 class Food(Item):
-    def __init__(self, pos, group, parent, name = "food", count = 1):
+    def __init__(self, pos, group, parent, name = "food"):
         super().__init__(pos, group, parent, name)
         self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
         self.poisonState = 0
@@ -117,20 +117,18 @@ class Food(Item):
             return
         print(f"{target.name} was poisoned")
         target.setState(self.poisonStates[self.poisonState])
-        
-
         if self.getPosionState()== 'ko': target.ko()
-
         self.kill()
 
     def update(self):
         self.pickUp()
         
 class Poison(Item):
-    def __init__(self, pos, group, parent, name = "ko", count = 1):
+    def __init__(self, pos, group, parent, name = 'knockout pill', poisonState = "ko", poisonType = 'pill'):
         super().__init__(pos, group, parent, name)
-        self.poisonType = 'pill'
-        self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
+        self.name = name
+        self.poisonType = poisonType
+        self.poisonStates = poisonState
         self.poisonState = 0
         self.enabled = True
         self.poisoned = False
@@ -179,4 +177,13 @@ class Gun(Item):
         self.fireRate = fireRate
         self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
     
+class Camera(Item):
+    def __init__(self, pos, group, parent, name):
+        super().__init__(pos, group, parent, name)
+        #self.sound = pygame.mixer.Sound(os.path.join("sounds", "camera.wav"))
+    def interact(self):
+        # take a picture of the screen and save it to the folder
+        pygame.image.save(self.parent.screen, os.path.join("screenshots", "test.png"))
+        #self.sound.play()
+        print("picture taken")
     

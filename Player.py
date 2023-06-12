@@ -6,7 +6,7 @@ from GameObject import GameObject
 from Character import Character
 from Inventory import Inventory
 
-from Item import Item, Poison, Explosive, Gun, Food
+from Item import Item, Poison, Explosive, Gun, Food, Camera
 
 
 #from Blood import Blood
@@ -147,6 +147,11 @@ class Player(Character):
             # it might be better if checking every frame, it will grab an object temporarily, moving the pos for both 
             self.fiberWire(touchingNPCs)
             return
+        
+        if type(currentItem) == Camera and pygame.key.get_pressed()[K_e]:
+            self.inputDelay = 30
+            currentItem.interact()
+            return
          
 
     # subdue if NPC is close enough
@@ -154,8 +159,10 @@ class Player(Character):
         # check if npc is close to players
         # subdue the npc
         self.inputDelay = 0
+        target.angle = self.angle
         target.gettingSubdued()
         target.rect.center = self.rect.center
+        # todo make the player be behind the npc when subduing
                 
     def movement(self):
         keysPressed = pygame.key.get_pressed()
