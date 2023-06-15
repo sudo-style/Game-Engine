@@ -6,13 +6,13 @@ from GameObject import GameObject
 class Item(pygame.sprite.Sprite, GameObject):
 	def __init__(self, pos, group, parent, name, count=1):
 		super().__init__(group)
+		GameObject.__init__(self, pos)
 		self.image = pygame.image.load(os.path.join("sprites", 'items', name + ".png")).convert_alpha()
 		self.rect = self.image.get_rect(center = pos)
 		self.parent = parent
 		self.name = name
 		self.pickUpTime = 0
 		self.count = count
-		self.pos = pos
 
 	def interact(self):
 		pass

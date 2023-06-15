@@ -11,6 +11,7 @@ white = (255, 255, 255)
 class Character(pygame.sprite.Sprite, GameObject):
 	def __init__(self, pos, group, parent, name):
 		super().__init__(group)
+		GameObject.__init__(self, pos)
 		self.name = name
 		self.image = pygame.image.load(os.path.join('sprites', 'character', name, name + '.png')).convert_alpha()
 		self.ko_image = pygame.image.load(os.path.join('sprites','character', name, 'ko.png')).convert_alpha()
@@ -30,7 +31,6 @@ class Character(pygame.sprite.Sprite, GameObject):
 		self.maxHealth = 100
 
 		self.suitName = name
-		self.pos = pos
 
 	def updateHealth(self):
 		blood_textures = {

@@ -3,7 +3,21 @@ import math, pygame
 class GameObject():
 	def __init__(self, pos):
 		self.pos = pos
+		self.velocity = 0
+		self.maxVelocity = 10
 
+	def setVelocity(self, velocity):
+		self.velocity = velocity
+
+	def addVelocity(self, velocity):
+		self.velocity = min(self.velocity + velocity, self.maxVelocity)
+
+	def subtractVelocity(self, velocity):
+		self.velocity = max(self.velocity - velocity, 0)
+	
+	def getVelocity(self):
+		return self.velocity
+	
 	def getDirectionTo(self, target):
 		return math.atan2(target.pos[1] - self.pos[1], target.pos[0] - self.pos[0])
 	
