@@ -1,6 +1,5 @@
-import pygame
+import pygame, os, math
 from pygame.locals import *
-import os
 from GameObject import GameObject
 
 class Item(pygame.sprite.Sprite, GameObject):
@@ -13,7 +12,9 @@ class Item(pygame.sprite.Sprite, GameObject):
 		self.name = name
 		self.pickUpTime = 0
 		self.count = count
-
+		self.velocity = 0 
+		self.direction = pygame.math.Vector2()
+		
 	def interact(self):
 		pass
 
@@ -31,7 +32,20 @@ class Item(pygame.sprite.Sprite, GameObject):
 
 	def update(self):
 		self.pickUp()
+		if type(self) == RemoteExplosive:
+			print(self.pos, self.direction, self.velocity)
+			print(math.cos(self.direction[0]), math.sin(-self.direction[1]))
 
+		# move the item in the direction of its velocity
+		self.subtractVelocity(1) # todo find sweet spot
+		
+		# players direction adds up to 1 so need to change to degrees
+		degrees = (math.radians(self.direction[0]), math.radians(self.direction[1]))
+		self.pos = (self.pos[0] + math.cos(degrees[0]) * self.velocity, 
+	    			self.pos[1] + math.sin(degrees[1]) * self.velocity)
+
+		self.rect.center = self.pos
+		
 class Explosive(Item):
 	def __init__(self, pos, group, parent, name = "bomb"):
 		super().__init__(pos, group, parent, name)
@@ -54,6 +68,7 @@ class Explosive(Item):
 
 	def update(self):
 		# trigger the explosive if the player is close enough
+		super().update()
 		self.pickUp()
 		self.ifTriggered()
 	

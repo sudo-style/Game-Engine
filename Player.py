@@ -175,7 +175,7 @@ class Player(Character):
 		if self.direction.length() > 0:
 			self.direction.normalize_ip()
 		self.rect.center += self.direction * self.speed
-
+		self.pos = self.rect.center
 		self.direction = pygame.math.Vector2(0, 0)
 
 	def mouseRotation(self):
