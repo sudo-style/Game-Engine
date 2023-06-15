@@ -46,11 +46,23 @@ class Inventory:
 		currentItem = self.currentItem()
 		# don't drop keeps
 		if self.isCurrentItemKeep(): return	
+		if self.isCurrentItemGun(): return # different item for gun
+		if self.isCurrentItemPoison(): return # different item for poison
+		print("DROPPING ITEM")
 		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].drop()
 		self.inventory.remove(currentItem)
-		return
+
+	def throwItem(self, pos, direction):
+		currentItem = self.currentItem()
+		if self.isCurrentItemGun(): return
+		if self.isCurrentItemKeep(): return
+		if self.isCurrentItemPoison(): return
+		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
+		self.grandparent.items.append(item)
+		self.grandparent.items[-1].throw(direction)
+		self.inventory.remove(currentItem)
 
 	def currentItem(self):
 		return self.inventory[0]

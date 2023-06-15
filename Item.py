@@ -30,6 +30,12 @@ class Item(pygame.sprite.Sprite, GameObject):
 			self.parent.player.inventory.addItem(self)
 			self.kill()
 
+	def throw(self, direction):
+		self.direction = direction
+		print(f"throwing {self.name} at {self.direction} with velocity {self.velocity}")
+		self.velocity = 20
+		self.direction = pygame.math.Vector2(self.parent.player.direction)
+
 	def update(self):
 		self.pickUp()
 		if type(self) == RemoteExplosive:
@@ -47,7 +53,7 @@ class Item(pygame.sprite.Sprite, GameObject):
 		self.rect.center = self.pos
 		
 class Explosive(Item):
-	def __init__(self, pos, group, parent, name = "bomb"):
+	def __init__(self, pos, group, parent, name = "bomb", direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, name)
 		self.damage = 100
 		self.damageRadius = 100
@@ -106,7 +112,7 @@ class Explosive(Item):
 		self.kill()
 
 class Grenade(Explosive):
-	def __init__(self, pos, group, parent, name = 'grenade'):
+	def __init__(self, pos, group, parent, name = 'grenade', direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, 'grenade')
 	
 	def drop(self):
@@ -120,7 +126,7 @@ class Grenade(Explosive):
 		if (self.fuseTime <= 0): self.explode()
 
 class RemoteExplosive(Explosive):
-	def __init__(self, pos, group, parent, name = 'remote explosive'):
+	def __init__(self, pos, group, parent, name = 'remote explosive', count = 1, direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, 'remote explosive')
 			 
 	def drop(self):
@@ -136,7 +142,7 @@ class RemoteExplosive(Explosive):
 		pass
 
 class Trigger(Item): # this will only exist in the player inventory, they can't drop it, once they use it it will be removed from the inventory
-	def __init__(self, pos, group, parent, explosiveParent, name = "trigger"):
+	def __init__(self, pos, group, parent, explosiveParent, name = "trigger", direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, name)
 		self.explosiveParent = explosiveParent
 
@@ -153,7 +159,7 @@ class Trigger(Item): # this will only exist in the player inventory, they can't 
 # player can poison food
 # NPC can move, and eat food
 class Food(Item):
-	def __init__(self, pos, group, parent, name = "food"):
+	def __init__(self, pos, group, parent, name = "food", direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, name)
 		self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
 		self.poisonState = 0
@@ -228,13 +234,13 @@ class Poison(Item):
 		self.kill()
 
 class Gun(Item):
-	def __init__(self, pos, group, parent, name, count, fireRate = 10):
+	def __init__(self, pos, group, parent, name, count, fireRate = 10, direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, name, count)
 		self.fireRate = fireRate
 		self.sound = pygame.mixer.Sound(os.path.join("sounds", "gun.WAV"))
 	
 class Camera(Item):
-	def __init__(self, pos, camera_group, parent, name):
+	def __init__(self, pos, camera_group, parent, name, count = 1, direction = 1, velocity = 1):
 		super().__init__(pos, camera_group, parent, name)
 		self.camera_group = camera_group
 		

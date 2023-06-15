@@ -32,6 +32,35 @@ class Player(Character):
 		self.inputDelay = max(self.inputDelay - 1, 0)
 		self.pos = self.rect.center
 	
+	def throw(self):
+		# thorws the current item in the inventory
+		if len(self.inventory.inventory) == 0: return
+		if self.inventory.isCurrentItemKeep(): return   
+		item = self.inventory.currentItem()
+		
+		
+		
+
+		# thow the item in the direction of the mouse
+		mouse_pos = pygame.mouse.get_pos()
+		delta_x = mouse_pos[0] - self.rect.center[0]
+		delta_y = mouse_pos[1] - self.rect.center[1]
+		playerToMouseAngle = math.atan2(delta_y, delta_x)
+		item.rect.center = self.rect.center
+		item.direction = (math.cos(playerToMouseAngle), math.sin(playerToMouseAngle))
+
+		# give the item a velocity
+		item.velocity = 20
+		item.pos = self.rect.center
+		#self.parent.items.append(item)
+		
+
+		self.inventory.throwItem(self.pos, self.direction)
+		
+		
+		#item.throw()
+		#item.pos = self.rect.center
+
 	def shoot(self):
 		gun = self.inventory.currentItem()
 		if self.inputDelay > 0: return
@@ -111,6 +140,11 @@ class Player(Character):
 
 		if keysPressed[K_z] and self.inputDelay == 0 and len(self.inventory.inventory) > 0:
 			self.inventory.dropItem(self.pos)
+			self.inputDelay = 30
+
+		# if x is pressed, throw the item
+		if keysPressed[K_x] and self.inputDelay == 0 and len(self.inventory.inventory) > 0:
+			self.throw()
 			self.inputDelay = 30
 			
 	def takeDisguise(self):
