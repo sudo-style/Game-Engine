@@ -43,13 +43,11 @@ class Player(Character):
 
 		# thow the item in the direction of the mouse
 		mouse_pos = pygame.mouse.get_pos()
-		delta_x = mouse_pos[0] - self.rect.center[0]
-		delta_y = mouse_pos[1] - self.rect.center[1]
+		delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
+		delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
 		playerToMouseAngle = math.atan2(delta_y, delta_x)
 		item.rect.center = self.rect.center
 		item.direction = (math.cos(playerToMouseAngle), math.sin(playerToMouseAngle))
-
-		print(f"DIRECTION: {item.direction}")
 
 		# give the item a velocity
 		item.velocity = 20
