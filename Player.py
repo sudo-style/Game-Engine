@@ -49,13 +49,15 @@ class Player(Character):
 		item.rect.center = self.rect.center
 		item.direction = (math.cos(playerToMouseAngle), math.sin(playerToMouseAngle))
 
+		print(f"DIRECTION: {item.direction}")
+
 		# give the item a velocity
 		item.velocity = 20
 		item.pos = self.rect.center
 		#self.parent.items.append(item)
 		
 
-		self.inventory.throwItem(self.pos, self.direction)
+		self.inventory.throwItem(self.pos, item.direction)
 		
 		
 		#item.throw()

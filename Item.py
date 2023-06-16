@@ -34,21 +34,22 @@ class Item(pygame.sprite.Sprite, GameObject):
 		self.direction = direction
 		print(f"throwing {self.name} at {self.direction} with velocity {self.velocity}")
 		self.velocity = 20
-		self.direction = pygame.math.Vector2(self.parent.player.direction)
+		self.direction = direction
 
 	def update(self):
 		self.pickUp()
-		if type(self) == RemoteExplosive:
-			print(self.pos, self.direction, self.velocity)
-			print(math.cos(self.direction[0]), math.sin(-self.direction[1]))
+		#if type(self) == RemoteExplosive:
+		#	print(self.pos, self.direction, self.velocity)
+		#	print(math.cos(self.direction[0]), math.sin(-self.direction[1]))
 
 		# move the item in the direction of its velocity
 		self.subtractVelocity(1) # todo find sweet spot
+
 		
 		# players direction adds up to 1 so need to change to degrees
-		degrees = (math.radians(self.direction[0]), math.radians(self.direction[1]))
-		self.pos = (self.pos[0] + math.cos(degrees[0]) * self.velocity, 
-	    			self.pos[1] + math.sin(degrees[1]) * self.velocity)
+		#degrees = (math.radians(self.direction[0]), math.radians(self.direction[1]))
+		self.pos = (self.pos[0] + self.direction[0] * self.velocity, 
+	    			self.pos[1] + self.direction[1] * self.velocity)
 
 		self.rect.center = self.pos
 		

@@ -55,12 +55,16 @@ class Inventory:
 		self.inventory.remove(currentItem)
 
 	def throwItem(self, pos, direction):
+		print(f"throwing item with direction {direction} at {pos} with velocity {self.currentItem().velocity}")
 		currentItem = self.currentItem()
 		if self.isCurrentItemGun(): return
 		if self.isCurrentItemKeep(): return
 		if self.isCurrentItemPoison(): return
 		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
+
+
+		print(f"before throw: {direction}")
 		self.grandparent.items[-1].throw(direction)
 		self.inventory.remove(currentItem)
 
