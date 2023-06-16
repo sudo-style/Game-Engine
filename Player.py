@@ -33,33 +33,26 @@ class Player(Character):
 		self.pos = self.rect.center
 	
 	def throw(self):
-		# thorws the current item in the inventory
+		# throws the current item in the inventory
 		if len(self.inventory.inventory) == 0: return
 		if self.inventory.isCurrentItemKeep(): return   
 		item = self.inventory.currentItem()
 		
+		# throw the item in the direction of the mouse
 		
-		
-
-		# thow the item in the direction of the mouse
+		# todo reused code from mouseRotation
 		mouse_pos = pygame.mouse.get_pos()
 		delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
 		delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
+
 		playerToMouseAngle = math.atan2(delta_y, delta_x)
 		item.rect.center = self.rect.center
-		item.direction = (math.cos(playerToMouseAngle), math.sin(playerToMouseAngle))
+		direction = (math.cos(playerToMouseAngle), math.sin(playerToMouseAngle))
 
 		# give the item a velocity
 		item.velocity = 20
 		item.pos = self.rect.center
-		#self.parent.items.append(item)
-		
-
-		self.inventory.throwItem(self.pos, item.direction)
-		
-		
-		#item.throw()
-		#item.pos = self.rect.center
+		self.inventory.throwItem(self.pos, direction)
 
 	def shoot(self):
 		gun = self.inventory.currentItem()
