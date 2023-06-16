@@ -43,28 +43,24 @@ class Inventory:
 				item.count = min(item.count, self.maxInventory()[name])	
 
 	def dropItem(self, pos):
+		# todo duplicate code from throwItem
 		currentItem = self.currentItem()
-		# don't drop keeps
 		if self.isCurrentItemKeep(): return	
 		if self.isCurrentItemGun(): return # different item for gun
 		if self.isCurrentItemPoison(): return # different item for poison
-		print("DROPPING ITEM")
 		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].drop()
 		self.inventory.remove(currentItem)
 
 	def throwItem(self, pos, direction):
-		print(f"throwing item with direction {direction} at {pos} with velocity {self.currentItem().velocity}")
+		# todo duplicate code from dropItem
 		currentItem = self.currentItem()
 		if self.isCurrentItemGun(): return
 		if self.isCurrentItemKeep(): return
 		if self.isCurrentItemPoison(): return
 		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
-
-
-		print(f"before throw: {direction}")
 		self.grandparent.items[-1].throw(direction)
 		self.inventory.remove(currentItem)
 
@@ -86,19 +82,13 @@ class Inventory:
 		return {'smg': 100, 'pistol': 69, 'sniper':100, 'gun':20}  
 	
 	def isCurrentItemGun(self):
-		gun = self.currentItem().name
-		guns = ['smg', 'pistol', 'sniper', 'gun']
-		return gun in guns
+		return type(self.currentItem()) == Gun
 	
 	def isCurrentItemPoison(self):
-		poison = self.currentItem().name
-		poisons = ['ko', 'lethal', 'emetic']
-		return poison in poisons
+		return type(self.currentItem()) == Poison
 	
 	def isCurrentItemExplosive(self):
-		explosive = self.currentItem().name
-		explosives = ['bomb', 'tnt', 'grenade', 'rubber duck']
-		return explosive in explosives
+		return type(self.currentItem()) == Explosive
 	
 	def isCurrentItemKeep(self):
 		keep = self.currentItem().name

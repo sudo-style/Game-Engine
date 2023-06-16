@@ -38,25 +38,19 @@ class Item(pygame.sprite.Sprite, GameObject):
 
 	def update(self):
 		self.pickUp()
-		#if type(self) == RemoteExplosive:
-		#	print(self.pos, self.direction, self.velocity)
-		#	print(math.cos(self.direction[0]), math.sin(-self.direction[1]))
-
-		# move the item in the direction of its velocity
-		self.subtractVelocity(1) # todo find sweet spot
-
 		
-		# players direction adds up to 1 so need to change to degrees
-		#degrees = (math.radians(self.direction[0]), math.radians(self.direction[1]))
+		self.subtractVelocity(1) # todo find sweet spot
+		
+		# the item is moving after this line
+		if self.velocity <= 0: return
+		
 		self.pos = (self.pos[0] + self.direction[0] * self.velocity, 
-	    			self.pos[1] + self.direction[1] * self.velocity)
-
+					self.pos[1] + self.direction[1] * self.velocity)
 		self.rect.center = self.pos
 
-		# if collides with npc then ko them
-		if self.velocity != 0:
-			if self.rect.collidelist(self.parent.npcs) != -1:
-				self.parent.npcs[self.rect.collidelist(self.parent.npcs)].ko()
+		# item collides with npc then ko them
+		if self.rect.collidelist(self.parent.npcs) != -1:
+			self.parent.npcs[self.rect.collidelist(self.parent.npcs)].ko()
 		
 class Explosive(Item):
 	def __init__(self, pos, group, parent, name = "bomb", direction = 1, velocity = 1):
