@@ -269,7 +269,7 @@ class Exit(Item):
 			print("\n")
 			for npc in self.parent.npcs:
 				print(npc.health)
-				if npc.health > 0: return
+				if npc.health > 0 and not npc.KO: return
 
 			# todo make this go to see the score
 			self.kill()
