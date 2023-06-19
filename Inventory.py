@@ -45,10 +45,13 @@ class Inventory:
 	def dropItem(self, pos):
 		# todo duplicate code from throwItem
 		currentItem = self.currentItem()
+		item = None
 		if self.isCurrentItemKeep(): return	
-		if self.isCurrentItemGun(): return # different item for gun
-		if self.isCurrentItemPoison(): return # different item for poison
-		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
+		elif self.isCurrentItemGun(): return # different item for gun
+		elif self.isCurrentItemPoison(): 
+			item = Poison(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.poisonStates, currentItem.poisonType) # different item for poison
+			print(f'dropping poison {currentItem.poisonState} {currentItem.poisonType}')
+		else: item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].drop()
 		self.inventory.remove(currentItem)
