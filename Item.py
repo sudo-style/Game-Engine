@@ -49,8 +49,10 @@ class Item(pygame.sprite.Sprite, GameObject):
 		self.rect.center = self.pos
 
 		# item collides with npc then ko them
+
 		if self.rect.collidelist(self.parent.npcs) != -1:
 			self.parent.npcs[self.rect.collidelist(self.parent.npcs)].ko()
+			if self.name == "knife": self.parent.npcs[self.rect.collidelist(self.parent.npcs)].kill()
 		
 class Explosive(Item):
 	def __init__(self, pos, group, parent, name = "bomb", direction = 1, velocity = 1):
