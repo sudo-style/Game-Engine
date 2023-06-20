@@ -114,11 +114,13 @@ class Explosive(Item):
 class Grenade(Explosive):
 	def __init__(self, pos, group, parent, name = 'grenade', direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, 'grenade')
-	
-	def drop(self):
+
+	def throw(self, direction):
+		super().throw(direction)
 		print(f"dropped Explosive {self.name}")
 		self.boolTriggered = True
 		self.fuse.play()
+		
 	
 	def ifTriggered(self):
 		if not self.boolTriggered: return
@@ -134,20 +136,12 @@ class RemoteExplosive(Explosive):
 		# if they press the trigger, then the original explosive will explode
 		trigger = Trigger((self.rect.center), self.parent.camera_group, self.parent, self, 'trigger')
 		self.parent.player.inventory.addItem(trigger)
-		pass
-
-	def ifTriggered(self):
 		
-		#self.explode()
-		pass
 
 class Trigger(Item): # this will only exist in the player inventory, they can't drop it, once they use it it will be removed from the inventory
 	def __init__(self, pos, group, parent, explosiveParent, name = "trigger", direction = 1, velocity = 1):
 		super().__init__(pos, group, parent, name)
 		self.explosiveParent = explosiveParent
-
-	def drop(self):
-		pass
 
 	def update(self):
 		self.kill()
