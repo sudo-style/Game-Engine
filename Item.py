@@ -155,7 +155,7 @@ class Trigger(Item): # this will only exist in the player inventory, they can't 
 # player can poison food
 # NPC can move, and eat food
 class Food(Item):
-	def __init__(self, pos, group, parent, name = "food", direction = 1, velocity = 1):
+	def __init__(self, pos, group, parent, name = "food"):
 		super().__init__(pos, group, parent, name)
 		self.poisonStates = ['none', 'ko', 'lethal', 'emetic']
 		self.poisonState = 0
@@ -177,9 +177,6 @@ class Food(Item):
 		target.setState(self.poisonStates[self.poisonState])
 		if self.getPoisonState()== 'ko': target.ko()
 		self.kill()
-
-	def update(self):
-		self.pickUp()
 		
 class Poison(Item):
 	def __init__(self, pos, group, parent, name = 'knockout pill', poisonState = "ko", poisonType = 'pill'):
