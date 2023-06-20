@@ -184,8 +184,7 @@ class Poison(Item):
 		super().__init__(pos, group, parent, name)
 		self.name = name
 		self.poisonType = poisonType
-		self.poisonStates = poisonState
-		self.poisonState = 0
+		self.poisonState = poisonState
 		self.enabled = True
 		self.poisoned = False
 		self.timer = 100
@@ -217,7 +216,7 @@ class Poison(Item):
 			for food in touchingFoods:
 				self.enabled = False
 				self.poisoned = True
-				food.gettingPoisoned('ko')
+				food.gettingPoisoned(self.poisonState)
 				print(f"poisoned {food.name}")
 		# when dropped it will try to poison the colliders either food or NPC 
 		# after 3 seconds it will disappear, showing that it has infected that area

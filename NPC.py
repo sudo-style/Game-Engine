@@ -68,6 +68,8 @@ class NPC(Character):
 	def movementController(self): # priority queue
 		state = self.getState()
 		# if knocked out, then can't do anything else
+		if state == 'lethal':
+			self.kill()
 		if self.KO: return
 		
 		# if alerted, then go to the alert position

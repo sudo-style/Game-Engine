@@ -49,7 +49,7 @@ class Inventory:
 		if self.isCurrentItemKeep(): return	
 		elif self.isCurrentItemGun(): return # different item for gun
 		elif self.isCurrentItemPoison(): 
-			item = Poison(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.poisonStates, currentItem.poisonType) # different item for poison
+			item = Poison(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.poisonState, currentItem.poisonType) # different item for poison
 			print(f'dropping poison {currentItem.poisonState} {currentItem.poisonType}')
 		else: item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
@@ -111,7 +111,7 @@ class Inventory:
 		item = self.currentItem()
 		font = pygame.font.SysFont(None, 30)
 		countText = font.render(str(item.count), True, (255,255,255))
-		nameText = font.render(str(item.name), True, (255,255,255))
+		nameText = font.render(str(item.name), True, (255,255,255)).convert_alpha()
 		self.grandparent.screen.blit(countText, (0,0))
 		self.grandparent.screen.blit(nameText, (90,60))
 		self.grandparent.screen.blit(item.image, (0, 30))

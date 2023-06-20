@@ -40,7 +40,8 @@ class Map:
 		
 		# add poison to the map
 		self.addPoison((300, 600), 'knockout pill', 'ko', 'pill')
-		self.addPoison((300, 600), 'knockout injection','ko', 'injection')
+		self.addPoison((400, 600), 'lethal pill', 'lethal', 'pill')
+		self.addPoison((500, 600), 'knockout injection','ko', 'injection')
 
 		self.addCamera((700,700))
 
