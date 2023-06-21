@@ -23,6 +23,7 @@ class NPC(Character):
 		self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
 		self.oxygen = 100
 		self.KO = False
+		maxStunTime = 100
 		
 	def breathing(self):
 		self.oxygen = min(self.oxygen + 1, 100)

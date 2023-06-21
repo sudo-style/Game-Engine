@@ -66,7 +66,7 @@ class Inventory:
 		elif self.isCurrentItemPoison(): return
 		elif type(currentItem) == Flashbang:
 			item = Flashbang(pos, self.grandparent.camera_group, self.grandparent)
-		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent)
+		else: item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].throw(direction)
 		self.inventory.remove(currentItem)

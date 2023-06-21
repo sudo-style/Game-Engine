@@ -249,6 +249,10 @@ class Flashbang(Item):
 			if self.timerTillTriggered <= 0:
 				self.explode()
 
+	def throw(self, direction):
+		super().throw(direction)
+		self.on = True
+
 	def stunTimeCharacters(self):
 		# distance to Character
 		characters = self.parent.npcs + [self.parent.player]
@@ -261,9 +265,8 @@ class Flashbang(Item):
 			if angle < 45: stunTime += 100
 
 			print(angle, character.name)
-				
-		
 			character.stunTime = stunTime
+			character.maxStunTime = stunTime
 			character.stunned = True
 			print(f"{character.stunTime} {character.name}")
 
@@ -273,18 +276,6 @@ class Flashbang(Item):
 		if animationPercentage <= 0.01: return animationPercentage / 0.01  # Rapidly ramp up from 0 to 1
 		elif 0.01 < animationPercentage <= 0.2: return 1  # Hold at 1 for 20% of the animation
 		else: return 1 - (animationPercentage - 0.2) / 0.4  # Slowly fade from 1 to 0
-
-	def draw(self):
-		if self.on:
-			# Calculate brightness for both flashbang and afterimage
-			flashbangBrightness = self.brightnessFunction()
-			# Determine the alpha values based on the brightness values
-			flashbangAlpha = int(flashbangBrightness * 255)
-			# Set alpha values for the whiteout surface and the afterimage surface
-			self.whiteoutSurface.set_alpha(flashbangAlpha)
-			# Draw the whiteout surface to cover the entire screen
-			self.screen.blit(self.whiteoutSurface, (0, 0))
-			self.screen.draw.update()
 
 
 class Gun(Item):

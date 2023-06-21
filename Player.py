@@ -28,8 +28,6 @@ class Player(Character):
 		self.whiteoutSurface.fill((255, 255, 255))
 		self.whiteoutSurface.set_alpha(0)  # Initial alpha value of 0
 
-		
-
 	def update(self):
 		self.input()
 		self.draw()
@@ -50,11 +48,12 @@ class Player(Character):
 			self.whiteoutSurface.set_alpha(flashbangAlpha)
 			# Draw the whiteout surface to cover the entire screen
 			self.parent.screen.blit(self.whiteoutSurface, (0, 0))
+			pygame.display.update()
 		pygame.display.update()
 		
 	def brightnessFunction(self):
 		# sometimes it will be short, othertimes it will be long
-		animationPercentage = 1 - self.stunTime/100
+		animationPercentage = 1 - self.stunTime/250
 		if animationPercentage <= 0.01: return animationPercentage / 0.01  # Rapidly ramp up from 0 to 1
 		elif 0.01 < animationPercentage <= 0.2: return 1  # Hold at 1 for 20% of the animation
 		else: return 1 - (animationPercentage - 0.2) / 0.4  # Slowly fade from 1 to 0
