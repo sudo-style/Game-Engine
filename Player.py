@@ -139,6 +139,11 @@ class Player(Character):
 		if keysPressed[K_x] and self.inputDelay == 0 and len(self.inventory.inventory) > 0:
 			self.throw()
 			self.inputDelay = 30
+
+		
+		# if h is pressed then print health
+		if keysPressed[K_h]:
+			print(self.health)
 			
 	def takeDisguise(self):
 		# check if player is close to the suit

@@ -38,10 +38,6 @@ class NPC(Character):
 		self.draw()
 		if self.health <= 0: self.kill()
 		self.pos = self.rect.center
-
-		player = self.parent.player
-		pygame.draw.line(self.parent.screen, (255, 255, 255), self.rect.center - self.group.offset, player.rect.center - player.group.offset, 2)
-		pygame.display.update()
 	
 	def getState(self):
 		return self.states[self.statesIndex]
@@ -198,7 +194,15 @@ class Guard(NPC):
 			self.alert()
 
 	def shoot(self):
-		print("SHOOTING")
+		player = self.parent.player
+		pygame.draw.line(self.parent.screen, (255, 255, 255), self.rect.center - self.group.offset, player.rect.center - player.group.offset, 2)
+		pygame.display.update()
+		player.health = max(0, player.health - 10)
+		# play sound of gun
+		# play gun.wav
+		pygame.mixer.music.load('sounds/gun.wav')
+		pygame.mixer.music.play(0)
+		
 		
 
 	def movementController(self): # priority queue
