@@ -13,14 +13,14 @@ class Flashbang:
         self.whiteoutSurface.set_alpha(0)  # Initial alpha value of 0
         self.on = False
         self.timer = 0
-        self.freezeFrame = pygame.image.load("freezeFrame.png")
+        #self.freezeFrame = pygame.image.load("freezeFrame.png")
 
     def trigger(self, stunTime=200):
         self.on = True
         self.timer = stunTime
         self.stunTime = stunTime
-        pygame.image.save(self.screen, "freezeFrame.png")
-        self.freezeFrame = pygame.image.load("freezeFrame.png")
+        #pygame.image.save(self.screen, "freezeFrame.png")
+        #self.freezeFrame = pygame.image.load("freezeFrame.png")
         print("triggered")
 
     def update(self):
@@ -51,17 +51,17 @@ class Flashbang:
 
             # Determine the alpha values based on the brightness values
             flashbangAlpha = int(flashbangBrightness * 255)
-            afterimageAlpha = int(afterimageBrightness * 255)
+            #afterimageAlpha = int(afterimageBrightness * 255)
 
             # Set alpha values for the whiteout surface and the afterimage surface
             self.whiteoutSurface.set_alpha(flashbangAlpha)
-            self.freezeFrame.set_alpha(afterimageAlpha)
+            #self.freezeFrame.set_alpha(afterimageAlpha)
 
             # Draw the whiteout surface to cover the entire screen
             self.screen.blit(self.whiteoutSurface, (0, 0))
 
             # Draw the freeze frame afterimage on top of the whiteout surface
-            self.screen.blit(self.freezeFrame, (0, 0))
+            #self.screen.blit(self.freezeFrame, (0, 0))
 
 def main():
     pygame.init()

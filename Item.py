@@ -77,7 +77,6 @@ class Explosive(Item):
 	def update(self):
 		# trigger the explosive if the player is close enough
 		super().update()
-		self.pickUp()
 		self.ifTriggered()
 	
 	def alertNPCs(self):
@@ -163,7 +162,7 @@ class Food(Item):
 	def getPoisonState(self):
 		return self.poisonStates[self.poisonState]
 	
-	def gettingPoisoned(self, state):
+	def getingPoisoned(self, state):
 		print('food is poisoned')
 		self.poisonState = self.poisonStates.index(state)
 	
@@ -224,6 +223,69 @@ class Poison(Item):
 		print(f"{target.name} was poisoned")
 		target.poisoned(self.poisonState)
 		self.kill()
+
+class Flashbang(Item):
+	def __init__(self, pos, group, parent):
+		super().__init__(pos, group, parent, name = 'flashbang')
+		self.enabled = True
+		self.timerTillTriggered = 100 
+		self.on = False
+		self.timer = 60
+
+	def drop(self):
+		self.on = True
+		print("triggered")
+
+
+	def explode(self):
+		self.stunTimeCharacters()
+		self.kill()
+
+	def update(self):
+		super().update()
+
+		if self.on:
+			self.timerTillTriggered -= 1
+			if self.timerTillTriggered <= 0:
+				self.explode()
+
+	def stunTimeCharacters(self):
+		# distance to Character
+		characters = self.parent.npcs + [self.parent.player]
+		for character in characters:
+			distance = self.getDistanceTo(character)
+			angle = math.degrees(self.getDirectionTo(character))
+			stunTime = 0
+			if distance < 100: stunTime += 100
+			if distance < 50: stunTime += 100
+			if angle < 45: stunTime += 100
+
+			print(angle, character.name)
+				
+		
+			character.stunTime = stunTime
+			character.stunned = True
+			print(f"{character.stunTime} {character.name}")
+
+	def brightnessFunction(self, stunTime):
+		# sometimes it will be short, othertimes it will be long
+		animationPercentage = 1 - self.timer / self.stunTime
+		if animationPercentage <= 0.01: return animationPercentage / 0.01  # Rapidly ramp up from 0 to 1
+		elif 0.01 < animationPercentage <= 0.2: return 1  # Hold at 1 for 20% of the animation
+		else: return 1 - (animationPercentage - 0.2) / 0.4  # Slowly fade from 1 to 0
+
+	def draw(self):
+		if self.on:
+			# Calculate brightness for both flashbang and afterimage
+			flashbangBrightness = self.brightnessFunction()
+			# Determine the alpha values based on the brightness values
+			flashbangAlpha = int(flashbangBrightness * 255)
+			# Set alpha values for the whiteout surface and the afterimage surface
+			self.whiteoutSurface.set_alpha(flashbangAlpha)
+			# Draw the whiteout surface to cover the entire screen
+			self.screen.blit(self.whiteoutSurface, (0, 0))
+			self.screen.draw.update()
+
 
 class Gun(Item):
 	def __init__(self, pos, group, parent, name, count, fireRate = 10, direction = 1, velocity = 1):

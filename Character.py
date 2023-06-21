@@ -31,6 +31,9 @@ class Character(pygame.sprite.Sprite, GameObject):
 		self.maxHealth = 100
 
 		self.suitName = name
+		
+		self.stunned = False
+		self.stunTime = 0
 
 	def updateHealth(self):
 		blood_textures = {

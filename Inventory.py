@@ -4,7 +4,7 @@ import os
 import math
 
 
-from Item import Item, Poison, Explosive, Gun, Food
+from Item import Item, Poison, Explosive, Gun, Food, Flashbang
 from CameraGroup import CameraGroup
 
 
@@ -51,6 +51,8 @@ class Inventory:
 		elif self.isCurrentItemPoison(): 
 			item = Poison(pos, self.grandparent.camera_group, self.grandparent, currentItem.name, currentItem.poisonState, currentItem.poisonType) # different item for poison
 			print(f'dropping poison {currentItem.poisonState} {currentItem.poisonType}')
+		elif type(currentItem) == Flashbang:
+			item = Flashbang(pos, self.grandparent.camera_group, self.grandparent)
 		else: item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].drop()
@@ -60,9 +62,11 @@ class Inventory:
 		# todo duplicate code from dropItem
 		currentItem = self.currentItem()
 		if self.isCurrentItemGun(): return
-		if self.isCurrentItemKeep(): return
-		if self.isCurrentItemPoison(): return
-		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent, currentItem.name)
+		elif self.isCurrentItemKeep(): return
+		elif self.isCurrentItemPoison(): return
+		elif type(currentItem) == Flashbang:
+			item = Flashbang(pos, self.grandparent.camera_group, self.grandparent)
+		item = type(currentItem)(pos, self.grandparent.camera_group, self.grandparent)
 		self.grandparent.items.append(item)
 		self.grandparent.items[-1].throw(direction)
 		self.inventory.remove(currentItem)
