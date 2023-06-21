@@ -38,6 +38,10 @@ class NPC(Character):
 		self.draw()
 		if self.health <= 0: self.kill()
 		self.pos = self.rect.center
+
+		player = self.parent.player
+		pygame.draw.line(self.parent.screen, (255, 255, 255), self.rect.center - self.group.offset, player.rect.center - player.group.offset, 2)
+		pygame.display.update()
 	
 	def getState(self):
 		return self.states[self.statesIndex]
@@ -160,6 +164,8 @@ class NPC(Character):
 		# if the NPC is done being idle, then go to the next waypoint
 		if self.waypoints[self.lenWaypoints()-1][1] <= 0: self.nextWaypoint()
 
+		
+
 class Guard(NPC):
 	def __init__(self, pos, group, parent, name = "guard"):
 		super().__init__(pos, group, parent, name)
@@ -192,7 +198,8 @@ class Guard(NPC):
 			self.alert()
 
 	def shoot(self):
-		pass
+		print("SHOOTING")
+		
 
 	def movementController(self): # priority queue
 		state = self.getState()
