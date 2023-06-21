@@ -34,10 +34,11 @@ class Map:
 		# add player to the map
 		self.player = Player((width/2, height/2), self.camera_group, self, 'player')
 
-		self.addItem((width/2, height/2), 'knife')
+		self.addItem((width/2 - 100, height/2), 'knife')
+
+
 		
 		# adding an npc to the map
-		self.addExplosive((width/2, height/2))
 		self.addGun((width/2-200, height/2+ 100), 'gun', 5, 20)
 		
 		# add poison to the map
