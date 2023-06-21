@@ -46,20 +46,8 @@ class CameraGroup(pygame.sprite.Group):
 		self.offset.x = self.camera_rect.left - self.camera_borders['left']
 		self.offset.y = self.camera_rect.top - self.camera_borders['top']
 
-	def keyboard_control(self):
-		keys = pygame.key.get_pressed()
-		if keys[pygame.K_a]: self.camera_rect.x -= self.keyboard_speed
-		if keys[pygame.K_d]: self.camera_rect.x += self.keyboard_speed
-		if keys[pygame.K_w]: self.camera_rect.y -= self.keyboard_speed
-		if keys[pygame.K_s]: self.camera_rect.y += self.keyboard_speed
-
-		self.offset.x = self.camera_rect.left - self.camera_borders['left']
-		self.offset.y = self.camera_rect.top - self.camera_borders['top']
-
 	def custom_draw(self,player):
 		self.box_target_camera(player)
-
-		#self.keyboard_control()
 
 		self.internal_surf.fill('#101010')
 

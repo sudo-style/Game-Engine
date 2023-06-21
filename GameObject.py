@@ -29,7 +29,7 @@ class GameObject():
 		targetToPlayer_angle = self.getDirectionTo(target)
 		angle_difference = abs(angleLooking - targetToPlayer_angle)
 		# if the difference is small enough then return true
-		return angle_difference <= math.radians(thresholdAngleDegrees) 
+		return angle_difference <= thresholdAngleDegrees
 	
 	def rot_center(self, image, angle):
 		"""rotate an image while keeping its center and size"""

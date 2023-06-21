@@ -242,7 +242,7 @@ class Player(Character):
 		mouse_pos = pygame.mouse.get_pos()
 		delta_x = mouse_pos[0] - self.rect.centerx + self.group.offset.x
 		delta_y = mouse_pos[1] - self.rect.centery + self.group.offset.y
-		self.angle = (180 / math.pi) * math.atan2(delta_y,delta_x)
+		self.angle = (180 / math.pi) * math.atan2(delta_y,delta_x) % 360
 	
 	def draw(self):
 		# Create a new surface for the transformed image

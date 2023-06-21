@@ -7,6 +7,8 @@ import copy
 
 from random import randint
 
+from Item import Flashbang
+
 class NPC(Character):
 	def __init__(self, pos, group, parent, name = "clown"):
 		super().__init__(pos, group, parent, name)

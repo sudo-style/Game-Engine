@@ -249,20 +249,40 @@ class Flashbang(Item):
 			if self.timerTillTriggered <= 0:
 				self.explode()
 
+
+		player = self.parent.player
+
+		direction = self.getDirectionTo(player)
+
+		if player.isInLineOfSight(self, player.angle, 10):
+			print("in line of sight of player")
+
 	def throw(self, direction):
 		super().throw(direction)
 		self.on = True
 
 	def stunTimeCharacters(self):
+		# todo doesn't work how I want it yet
 		# distance to Character
 		characters = self.parent.npcs + [self.parent.player]
 		for character in characters:
 			distance = self.getDistanceTo(character)
 			angle = math.degrees(self.getDirectionTo(character))
+
 			stunTime = 0
-			if distance < 100: stunTime += 100
-			if distance < 50: stunTime += 100
-			if angle < 45: stunTime += 100
+			
+			angleFlashbangtoPlayer = 0
+			if character.isInLineOfSight(self, angleFlashbangtoPlayer, 45):
+				print("in line of sight")
+				
+				stunTime += 1000
+			
+			print(angleFlashbangtoPlayer)
+
+			
+			#if distance < 100: stunTime += 100
+			#if distance < 50: stunTime += 100
+			#if angle < 45: stunTime += 100
 
 			print(angle, character.name)
 			character.stunTime = stunTime
