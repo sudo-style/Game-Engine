@@ -31,6 +31,7 @@ class Player(Character):
 	def update(self):
 		self.input()
 		self.draw()
+		
 		self.rect.center += self.direction * self.speed
 		self.inventory.update()
 		

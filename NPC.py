@@ -168,6 +168,7 @@ class NPC(Character):
 class Guard(NPC):
 	def __init__(self, pos, group, parent, name = "guard"):
 		super().__init__(pos, group, parent, name)
+		self.timeInAlertMode = 0
 
 		self.waypoints = [['patrol', (0, 0)], 
 						  ['patrol', (100, 100)], 
@@ -177,11 +178,17 @@ class Guard(NPC):
 		self.originalWaypoints = copy.deepcopy(self.waypoints)  # Deep copy of original waypoints
 
 	def combat(self):
+		self.timeInAlertMode += 1
+
+		if self.timeInAlertMode%4 == 0:
+			# drop a flashbang
+			print("flashbang")
 		# try to follow the player and shoot at them
 		player = self.parent.player
 		angleNPCtoPlayer = self.getDirectionTo(player)
 		if self.isInLineOfSight(player, angleNPCtoPlayer, 10):
 			self.shoot()
+			player.updateHealth()
 		else:
 			self.setState('alert')
 			self.setSearchPos(player.rect.center, 100)
@@ -189,7 +196,7 @@ class Guard(NPC):
 		
 		# if the player is close enough, then go into combat mode
 		if self.getDistanceTo(player) < 100:
-			print("Lets throw hands")
+			if self.timeInAlertMode%4 == 0: print("Lets throw hands")
 			self.setState('combat')
 		else:
 			self.setState('alert')
